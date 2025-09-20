@@ -18,7 +18,6 @@
     </ItemGroup>
 
     <ItemGroup>
-	  <Folder Include="Assets\Effects\" />
 	  <Folder Include="Assets\Images\" />
 	  <Folder Include="Assets\Music\" />
 	  <Folder Include="Common\Utils\" />
@@ -26,6 +25,10 @@
     
     <ItemGroup Condition="'$(DesignTimeBuild)' != 'true'">
         <EffectFiles Include="**/*.hlsl"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ClCompile Include="Assets\Effects\FourPointGradient.hlsl" />
     </ItemGroup>
     <Target Name="BuildEffects" BeforeTargets="BuildMod" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
         <Exec Command="@(EffectFiles->'&quot;./Assets/Effects/Compiler/fxc.exe&quot; &quot;%(RecursiveDir)%(FileName)%(Extension)&quot; /T fx_2_0 /nologo /Fo &quot;%(RecursiveDir)%(FileName).fxc&quot; &#xA;&#xD;')" IgnoreExitCode="true"/>
