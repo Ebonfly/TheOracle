@@ -22,7 +22,6 @@
 	  <Folder Include="Assets\Images\" />
 	  <Folder Include="Assets\Music\" />
 	  <Folder Include="Common\Utils\" />
-	  <Folder Include="Content\" />
 	</ItemGroup>
     
     <ItemGroup Condition="'$(DesignTimeBuild)' != 'true'">
