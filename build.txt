@@ -1,0 +1,3 @@
+displayName = The Oracle (Standalone Bossfight)
+author = Ebonfly
+version = 0.1
