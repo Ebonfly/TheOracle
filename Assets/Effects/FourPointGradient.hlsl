@@ -1,4 +1,4 @@
-sampler uImage0 : register(s0);
+sampler2D uImage0 : register(s0);
 
 float4 colorTL;
 float4 colorTR;
@@ -12,7 +12,7 @@ float4 main(float4 sampleColor : COLOR0, float2 uv : TEXCOORD0) : COLOR0
     float4 light = lerp(top, bottom, uv.y);
     return tex2D(uImage0, uv) * light;
 }
-#ifdef FX
+
 technique Technique1
 {
     pass StripShader
@@ -20,4 +20,3 @@ technique Technique1
         PixelShader = compile ps_3_0 main();
     }
 }
-#endif
