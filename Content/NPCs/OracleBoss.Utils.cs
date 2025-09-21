@@ -8,6 +8,7 @@ namespace TheOracle.Content.NPCs;
 public partial class OracleBoss : ModNPC
 {
     public Player Player => Main.player[NPC.target];
+    private float IdleSwayFactor => MathF.Sin(ConstantTimer * 0.0125f);
 
     public void TargetingLogic(int take = 0)
     {
@@ -19,21 +20,20 @@ public partial class OracleBoss : ModNPC
             AIState = Despawn;
     }
 
-    public void IdleAnimations()
+    public void IdleCrystal(float t = 1f)
     {
-        float factor = MathF.Sin(ConstantTimer * 0.0125f);
+        CrystalPosition = Vector2.Lerp(CrystalPosition, NPC.Center - new Vector2(IdleSwayFactor * 6,
+            NPC.height * 0.28f - MathF.Sin(MathF.Abs(IdleSwayFactor) * MathHelper.Pi) * 6).RotatedBy(NPC.rotation), t);
+        CrystalRotation = NPC.rotation + IdleSwayFactor * 0.05f;
+    }
 
-        EyeTarget = Player.Center;
-        CrystalPosition =
-            NPC.Center -
-            new Vector2(factor * 6, NPC.height * 0.28f - MathF.Sin(MathF.Abs(factor) * MathHelper.Pi) * 6).RotatedBy(
-                NPC.rotation);
-        CrystalRotation = NPC.rotation + factor * 0.05f;
-
+    public void IdleOrbs(float t = 1f)
+    {
         for (int i = 0; i < OrbPosition.Length; i++)
-            OrbPosition[i] = NPC.Center +
-                             new Vector2(150 + MathF.Sin(ConstantTimer * 0.025f + i * 10) * 20).RotatedBy(
-                                 MathHelper.TwoPi * i / (float)OrbPosition.Length + factor * 0.2f);
+            OrbPosition[i] = Vector2.Lerp(OrbPosition[i], NPC.Center + new Vector2(150 +
+                MathF.Sin(ConstantTimer * 0.025f + i * 10) * 20).RotatedBy(
+                MathHelper.TwoPi * i / (float)OrbPosition.Length +
+                IdleSwayFactor * 0.2f), t);
     }
 
     public void CacheEyePosition(Vector2 target)

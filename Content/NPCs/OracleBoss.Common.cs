@@ -22,12 +22,39 @@ public partial class OracleBoss : ModNPC
     private const int OrbAmount = 4;
     public float[] OrbRotation = new float[OrbAmount];
     public Vector2[] OrbPosition = new Vector2[OrbAmount];
+    public float IdleSpeed = 1f;
     public int ConstantTimer;
     public ref float AIState => ref NPC.ai[0];
     public ref float AITimer => ref NPC.ai[1];
     public ref float AITimer2 => ref NPC.ai[2];
     public ref float AITimer3 => ref NPC.ai[3];
-    public const int Despawn = -2, Idle = -1, Intro = 0;
+
+    private const int Despawn = -1,
+        Intro = 0,
+        OrbConjure = 1,
+        CrystalSliceDash = 2,
+        MagicRain = 3,
+        OrbClockHandSwordForm = 4,
+        TeleportOrbWeb = 5,
+        SweepingProjectilesThatReverse = 6,
+        LaserRefraction = 7;
+
+    void DoAI()
+    {
+        AIState = AIState switch
+        {
+            Despawn => DoDespawn(),
+            Intro => DoIntro(),
+            OrbConjure => DoOrbConjure(),
+            CrystalSliceDash => DoCrystalSliceDash(),
+            MagicRain => DoMagicRain(),
+            OrbClockHandSwordForm => DoOrbClockHandSwordForm(),
+            TeleportOrbWeb => DoTeleportOrbWeb(),
+            SweepingProjectilesThatReverse => DoSweepingProjectilesThatReverse(),
+            LaserRefraction => DoLaserRefraction(),
+            _ => AIState
+        };
+    }
 
     public override void SetStaticDefaults()
     {
