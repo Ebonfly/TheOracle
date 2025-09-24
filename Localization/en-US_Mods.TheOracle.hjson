@@ -1,1 +1,6 @@
 NPCs.OracleBoss.DisplayName: Oracle Boss
+
+Projectiles: {
+	OracleMiniClock.DisplayName: Oracle Mini Clock
+	OracleSkipperProjectile.DisplayName: Oracle Skipper Projectile
+}

@@ -10,6 +10,14 @@ public partial class OracleBoss : ModNPC
     public Player Player => Main.player[NPC.target];
     private float IdleSwayFactor => MathF.Sin(ConstantTimer * 0.0125f);
 
+    int ResetTo(int move, int idleTime = 200)
+    {
+        AITimer = -idleTime;
+        AITimer2 = 0;
+        AITimer3 = 0;
+        return move;
+    }
+
     public void TargetingLogic(int take = 0)
     {
         if (AIState <= Intro)

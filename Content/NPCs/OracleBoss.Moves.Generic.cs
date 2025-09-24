@@ -11,6 +11,8 @@ public partial class OracleBoss : ModNPC
 
     int DoIntro()
     {
+        IdleOrbs(1);
+        return OrbConjure;
         return Intro;
     }
 }
