@@ -44,6 +44,12 @@ public partial class OracleBoss : ModNPC
                 IdleSwayFactor * 0.2f), t);
     }
 
+    public void OminousYVelHover(float ampFactor = 0.05f, float freqFactor = 0.5f, float t = 1f)
+    {
+        NPC.velocity.Y = MathHelper.Lerp(NPC.velocity.Y,
+            MathHelper.Clamp(MathF.Sin(ConstantTimer * ampFactor) * freqFactor, -0.5f, 0.2f), t);
+    }
+
     public void CacheEyePosition(Vector2 target)
     {
         for (int i = _cachedEyeOffsets.Length - 1; i > 0; i--)

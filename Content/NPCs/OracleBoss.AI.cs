@@ -12,12 +12,15 @@ public partial class OracleBoss : ModNPC
         TargetingLogic(0);
         ConstantTimer++;
 
-        NPC.velocity = (Main.MouseWorld - NPC.Center) * 0.01f;
         NPC.rotation = MathHelper.Clamp(NPC.velocity.X * 0.1f, -0.3f, 0.3f);
         if (Main.mouseRight)
         {
+            NPC.velocity = (Main.MouseWorld - NPC.Center) * 0.01f;
             AITimer = 0;
             AITimer2 = 0;
+            AITimer3 = 0;
+            IdleOrbs();
+            IdleCrystal();
         }
 
         AITimer++;

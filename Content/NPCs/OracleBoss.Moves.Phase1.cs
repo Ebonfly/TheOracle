@@ -22,7 +22,20 @@ public partial class OracleBoss : ModNPC
 
         AITimer2 += factor;
         if (AITimer < 50 || AITimer > 560)
+        {
+            AITimer3 = MathHelper.Lerp(AITimer3, 1, 0.05f);
+            OminousYVelHover(AITimer3);
+            NPC.velocity.X *= 0.98f;
             EyeTarget = Player.Center;
+        }
+        else
+        {
+            AITimer3 = 0;
+            NPC.velocity = Vector2.Lerp(NPC.velocity,
+                ((EyeTarget + new Vector2(600).RotatedBy(MathHelper.ToRadians(ConstantTimer))) - NPC.Center) * 0.01f,
+                0.05f);
+        }
+
         for (int i = 0; i < OrbPosition.Length; i++)
         {
             float angle = MathHelper.TwoPi * i / (float)OrbPosition.Length;
