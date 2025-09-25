@@ -6,6 +6,7 @@ using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheOracle.Content.Dusts;
 
 namespace TheOracle.Content.Projectiles;
 
@@ -46,28 +47,32 @@ public class OracleMiniClock : ModProjectile
         else if (Projectile.ai[0] > 50)
             Projectile.ai[1] = MathHelper.Lerp(Projectile.ai[1], 1, 0.05f);
 
-        if ((int)Projectile.ai[0] == 410)
+        if ((int)Projectile.ai[0] == 380)
         {
             if (Main.netMode != 1)
                 for (int i = 0; i < 12; i++)
                 {
                     float angle = MathHelper.TwoPi * i / 12f;
-                    for (int j = 0; j < 3; j++)
-                        Projectile.NewProjectile(null, Projectile.Center,
-                            (angle + j * 2).ToRotationVector2() * (j + 1) * 0.5f,
-                            ModContent.ProjectileType<OracleSkipperProjectile>(),
-                            Projectile.damage, 0);
+                    Projectile.NewProjectile(null, Projectile.Center,
+                        (angle).ToRotationVector2(),
+                        ModContent.ProjectileType<OracleJetBeam>(),
+                        Projectile.damage, 0);
                 }
+        }
 
+        if ((int)Projectile.ai[0] == 410)
+        {
             Projectile.localAI[0] = 1;
-            SoundEngine.PlaySound(new SoundStyle("TheOracle/Assets/Sounds/clockBell"), Projectile.Center);
+            SoundEngine.PlaySound(new SoundStyle("TheOracle/Assets/Sounds/clockBell").WithVolumeScale(3));
         }
 
         if (Projectile.ai[0] > 340 && Projectile.ai[0] < 400)
         {
             Vector2 pos = Projectile.Center + Main.rand.NextVector2Unit() * Main.rand.NextFloat(150, 300);
             for (int i = 0; i < 3; i++)
-                Dust.NewDustPerfect(pos, DustID.GemSapphire, (Projectile.Center - pos).SafeNormalize(Vector2.Zero) * 10)
+                Dust.NewDustPerfect(pos, ModContent.DustType<GlowDust>(),
+                        (Projectile.Center - pos).SafeNormalize(Vector2.Zero) * 5,
+                        newColor: Color.CornflowerBlue with { A = 0 })
                     .noGravity = true;
         }
 
@@ -86,7 +91,7 @@ public class OracleMiniClock : ModProjectile
                         (Projectile.localAI[1] - MathHelper.PiOver2 + j * 0.3f).ToRotationVector2() *
                         (i - MathF.Abs(j * 0.5f)),
                         ModContent.ProjectileType<OracleSkipperProjectile>(),
-                        Projectile.damage, 0);
+                        Projectile.damage, 0, ai1: Projectile.timeLeft);
             }
 
             Projectile.localAI[1] += MathHelper.Pi / 12f;

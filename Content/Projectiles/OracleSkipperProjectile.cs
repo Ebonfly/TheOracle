@@ -5,6 +5,7 @@ using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheOracle.Content.Dusts;
 
 namespace TheOracle.Content.Projectiles;
 
@@ -55,9 +56,10 @@ public class OracleSkipperProjectile : ModProjectile
 
         Projectile.rotation = Projectile.velocity.ToRotation();
         Projectile.ai[0]++;
-        if ((int)Projectile.ai[0] % 30 < 2 && Projectile.velocity.Length() < 25f)
+        Projectile.ai[1]--;
+        if ((int)Projectile.ai[0] % 30 < 2 && Projectile.velocity.Length() < 25f && Projectile.ai[1] > 0)
             Projectile.velocity =
-                new Vector2(Projectile.velocity.Length() + 0.5f, 0).RotatedBy(Projectile.velocity.ToRotation() +
-                                                                              MathHelper.Pi / 24f);
+                new Vector2(Projectile.velocity.Length() + 1f, 0).RotatedBy(Projectile.velocity.ToRotation() +
+                                                                            MathHelper.Pi / 24f);
     }
 }
