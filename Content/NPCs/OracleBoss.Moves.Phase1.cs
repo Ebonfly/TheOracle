@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheOracle.Content.Dusts;
 using TheOracle.Content.Projectiles;
 
 namespace TheOracle.Content.NPCs;
@@ -54,6 +55,91 @@ public partial class OracleBoss : ModNPC
 
     int DoCrystalSliceDash()
     {
+        IdleOrbs();
+        EyeTarget = CrystalPosition;
+        if (AITimer < 2)
+            NPC.velocity = Vector2.Zero;
+        if (AITimer < 30)
+            NPC.velocity.Y -= 0.05f;
+        else
+            NPC.velocity *= 0.95f;
+
+        if (AITimer < 40)
+            IdleCrystal();
+        else if (AITimer < 80)
+        {
+            CrystalRotation = Utils.AngleLerp(CrystalRotation, 0, 0.1f);
+            CrystalPosition.Y -= MathHelper.SmoothStep(1, 2, MathF.Sin((AITimer - 40f) / 40f * MathHelper.Pi));
+            CrystalPosition.X = MathHelper.Lerp(CrystalPosition.X, NPC.Center.X, 0.1f);
+            Vector2 pos = CrystalPosition +
+                          Main.rand.NextVector2Unit() * 700;
+            for (int i = 0; i < 3; i++)
+                Dust.NewDustPerfect(pos, ModContent.DustType<GlowDust>(),
+                    (CrystalPosition - new Vector2(0, 40) - pos).SafeNormalize(Vector2.Zero) * 16,
+                    newColor: Color.CornflowerBlue with { A = 0 }, Scale: 0.9f).noGravity = true;
+        }
+        else if ((int)AITimer == 140)
+        {
+            CrystalFlash = 1;
+            SoundEngine.PlaySound(SoundID.Item4.WithPitchOffset(-0.5f), CrystalPosition);
+        }
+
+        if (AITimer > 140)
+        {
+            if (AITimer < 170)
+                CrystalRotation =
+                    CrystalRotation.AngleLerp((Player.Center - CrystalPosition).ToRotation() + MathHelper.PiOver2,
+                        0.1f);
+            else if ((int)AITimer == 170)
+                Projectile.NewProjectile(null, CrystalPosition, CrystalTipDirection,
+                    ModContent.ProjectileType<CrystalSlice>(), 25, 0);
+            else if (AITimer < 190)
+                CrystalPosition -= CrystalTipDirection * MathF.Sin(MathF.Pow((AITimer - 170) / 20f, 2) * MathHelper.Pi);
+            else if (AITimer < 220)
+            {
+                CrystalPosition += CrystalTipDirection *
+                                   MathHelper.SmoothStep(100, 20, MathHelper.Clamp((AITimer - 190) / 10f, 0, 1));
+                if (AITimer < 200)
+                    CrystalOpacity = MathHelper.SmoothStep(1, 0, (AITimer - 190) / 10f);
+            }
+            else if ((int)AITimer == 220)
+            {
+                CrystalOpacity = 0;
+                for (int i = -3; i < 4; i++)
+                    Projectile.NewProjectile(null, CrystalPosition + CrystalTipDirection.RotatedBy(-i * 0.2f) * 400,
+                        -CrystalTipDirection.RotatedBy(i * 0.2f),
+                        ModContent.ProjectileType<CrystalSlice>(), 25, 0);
+            }
+            else if ((int)AITimer == 270)
+            {
+                for (int i = -6; i < 7; i++)
+                    Projectile.NewProjectile(null,
+                        CrystalPosition - CrystalTipDirection.RotatedBy(i * 0.05f) * 2000 +
+                        CrystalTipDirection.RotatedBy(-i * 0.1f) * 400,
+                        CrystalTipDirection.RotatedBy(-i * 0.15f),
+                        ModContent.ProjectileType<CrystalSlice>(), 25, 0);
+            }
+            else if ((int)AITimer == 300)
+            {
+                Vector2 usualPos = NPC.Center - new Vector2(IdleSwayFactor * 6,
+                        NPC.height * 0.28f - MathF.Sin(MathF.Abs(IdleSwayFactor) * MathHelper.Pi) * 6)
+                    .RotatedBy(NPC.rotation);
+                Projectile.NewProjectile(null, CrystalPosition + CrystalTipDirection * 750,
+                    (usualPos - (CrystalPosition + CrystalTipDirection * 750)).SafeNormalize(Vector2.UnitX),
+                    ModContent.ProjectileType<CrystalSlice>(), 0, 0);
+
+                float rot = CrystalRotation;
+                IdleCrystal();
+                CrystalRotation = rot;
+            }
+
+            if (AITimer > 330)
+                CrystalOpacity = MathHelper.Lerp(CrystalOpacity, 1f, 0.15f);
+
+            if (AITimer > 345)
+                IdleCrystal(AITimer2 = MathHelper.Lerp(AITimer2, 1, 0.025f));
+        }
+
         return CrystalSliceDash;
     }
 

@@ -4,4 +4,5 @@ Projectiles: {
 	OracleMiniClock.DisplayName: Oracle Mini Clock
 	OracleSkipperProjectile.DisplayName: Oracle Skipper Projectile
 	OracleJetBeam.DisplayName: Oracle Jet Beam
+	CrystalSlice.DisplayName: Crystal Slice
 }

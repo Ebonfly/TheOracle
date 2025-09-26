@@ -12,6 +12,8 @@ namespace TheOracle.Content.NPCs;
 public partial class OracleBoss : ModNPC
 {
     readonly Vector2 _mainOrigin = new Vector2(202, 306) * 0.5f;
+    public float CrystalFlash, CrystalOpacity = 1f;
+
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
@@ -25,8 +27,15 @@ public partial class OracleBoss : ModNPC
             SpriteEffects.None, 0);
 
         Rectangle crystalFrame = new Rectangle(0, NPC.frame.X / NPC.frame.Width * 92, 50, 92);
-        spriteBatch.Draw(crystalTex, CrystalPosition - screenPos, crystalFrame, Color.White, CrystalRotation,
-            crystalFrame.Size() / 2f, NPC.scale, SpriteEffects.None, 0);
+
+        spriteBatch.Draw(crystalTex, CrystalPosition - screenPos, crystalFrame,
+            Color.White with { A = 0 } * CrystalFlash * 2, CrystalRotation,
+            crystalFrame.Size() / 2f, NPC.scale + (1 - CrystalFlash) * CrystalOpacity, SpriteEffects.None, 0);
+
+        spriteBatch.Draw(crystalTex, CrystalPosition - screenPos, crystalFrame, Color.White * CrystalOpacity,
+            CrystalRotation, crystalFrame.Size() / 2f, NPC.scale, SpriteEffects.None, 0);
+
+        CrystalFlash = MathHelper.Lerp(CrystalFlash, 0, 0.15f);
 
         spriteBatch.Draw(underlayer2, NPC.Center - screenPos, null, drawColor, NPC.rotation, _mainOrigin, NPC.scale,
             SpriteEffects.None, 0);

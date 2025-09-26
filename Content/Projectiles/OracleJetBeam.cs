@@ -37,7 +37,7 @@ public class OracleJetBeam : ModProjectile
 
     public override bool ShouldUpdatePosition() => false;
 
-    public override bool? CanDamage() => Projectile.timeLeft < 40;
+    public override bool? CanDamage() => Projectile.timeLeft is > 20 and < 40;
 
     public override void AI()
     {

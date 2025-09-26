@@ -9,12 +9,14 @@ public partial class OracleBoss : ModNPC
 {
     public Player Player => Main.player[NPC.target];
     private float IdleSwayFactor => MathF.Sin(ConstantTimer * 0.0125f);
+    public Vector2 CrystalTipDirection => CrystalRotation.ToRotationVector2().RotatedBy(-MathHelper.PiOver2);
 
     int ResetTo(int move, int idleTime = 200)
     {
         AITimer = -idleTime;
         AITimer2 = 0;
         AITimer3 = 0;
+        NPC.netUpdate = true;
         return move;
     }
 
@@ -32,7 +34,7 @@ public partial class OracleBoss : ModNPC
     {
         CrystalPosition = Vector2.Lerp(CrystalPosition, NPC.Center - new Vector2(IdleSwayFactor * 6,
             NPC.height * 0.28f - MathF.Sin(MathF.Abs(IdleSwayFactor) * MathHelper.Pi) * 6).RotatedBy(NPC.rotation), t);
-        CrystalRotation = NPC.rotation + IdleSwayFactor * 0.05f;
+        CrystalRotation = Utils.AngleLerp(CrystalRotation, NPC.rotation + IdleSwayFactor * 0.05f, t);
     }
 
     public void IdleOrbs(float t = 1f)

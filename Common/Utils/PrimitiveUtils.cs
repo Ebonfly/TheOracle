@@ -104,11 +104,11 @@ public static class PrimitiveUtils
     }
 
     public static void DrawTexturedPrimitives(VertexPositionColorTexture[] vertices, PrimitiveType type,
-        Asset<Texture2D> texture, bool drawBacksides = true, bool actualColor = false, bool unscaled = false) =>
+        Asset<Texture2D> texture, bool drawBacksides = false, bool actualColor = false, bool unscaled = false) =>
         DrawTexturedPrimitives(vertices, type, texture.Value, drawBacksides, actualColor, unscaled);
 
     public static void DrawTexturedPrimitives(VertexPositionColorTexture[] vertices, PrimitiveType type,
-        Texture2D texture, bool drawBacksides = true, bool actualColor = false, bool unscaled = false)
+        Texture2D texture, bool drawBacksides = false, bool actualColor = false, bool unscaled = false)
     {
         GraphicsDevice device = Main.graphics.GraphicsDevice;
         Effect effect = TheOracle.TrailShader.Value;
