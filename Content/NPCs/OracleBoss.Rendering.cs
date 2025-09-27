@@ -50,8 +50,79 @@ public partial class OracleBoss : ModNPC
 
         for (int i = 0; i < OrbPosition.Length; i++)
             spriteBatch.Draw(orbTex, OrbPosition[i] - screenPos, OrbFrame, Color.White, OrbRotation[i],
-                OrbFrame.Size() / 2, NPC.scale, SpriteEffects.None, 0);
+                OrbFrame.Size() / 2f, NPC.scale, SpriteEffects.None, 0);
+
+        if ((int)AIState is OrbClockHandSwordForm)
+            DrawSword(spriteBatch, screenPos);
+
         return false;
+    }
+
+    void DrawSword(SpriteBatch spriteBatch, Vector2 screenPos)
+    {
+        Texture2D sword = Assets.Extras.clockHandShort.Value;
+        Texture2D sword2 = Assets.Extras.clockHandLong.Value;
+        Texture2D flare = Assets.Extras.lensflare.Value;
+        Texture2D crosslight = Assets.Extras.crosslight.Value;
+        Texture2D clock = Assets.Extras.clock_premult.Value;
+        Texture2D glow = Assets.Extras.glow.Value;
+
+        float scaleX = MathF.Pow(MathHelper.Clamp(AITimer3 * 0.5f, 0, 2), 2);
+        float scale = MathF.Pow(MathHelper.Clamp(AITimer3 - 1f, 0, 2), 2);
+        Vector2 position = OrbPosition[0] - screenPos;
+        float rotation = (EyeTarget - OrbPosition[0]).ToRotation() + MathHelper.Pi;
+
+        float aura = (Main.GlobalTimeWrappedHourly * 0.5f) % 1f;
+        float initialExplosion = MathHelper.Clamp((AITimer - 60f) / 50f, 0, 1); // change later 
+
+        for (int i = 0; i < 2; i++)
+        {
+            Color color = (i == 0 ? Color.White : Color.CornflowerBlue) with { A = 0 } * scaleX;
+
+            spriteBatch.Draw(sword, position, null, color * 0.1f * MathF.Sin(aura * MathHelper.Pi),
+                rotation + MathHelper.Pi, new Vector2(84, sword.Height / 2f),
+                new Vector2(scaleX, scale * scale + i * 0.07f) * (0.5f + aura * 0.4f), SpriteEffects.None, 0);
+
+            spriteBatch.Draw(sword2, position, null, color * 0.1f * MathF.Sin(aura * MathHelper.Pi), rotation,
+                new Vector2(84, sword2.Height / 2f),
+                new Vector2(scaleX, scale * scale + i * 0.07f) * (0.5f + aura * 0.4f),
+                SpriteEffects.None, 0);
+
+            spriteBatch.Draw(sword, position, null, color * 0.7f, rotation + MathHelper.Pi,
+                new Vector2(84, sword.Height / 2f),
+                new Vector2(scaleX, scale * scale + i * 0.07f) * 0.5f, SpriteEffects.None, 0);
+
+            spriteBatch.Draw(sword2, position, null, color * 0.6f, rotation, new Vector2(84, sword2.Height / 2f),
+                new Vector2(scaleX, scale * scale + i * 0.07f) * 0.5f, SpriteEffects.None, 0);
+
+            spriteBatch.Draw(flare, position, null, color * (0.9f + MathF.Sin(Main.GlobalTimeWrappedHourly * 2) * 0.3f),
+                rotation + MathHelper.PiOver2, flare.Size() / 2f, new Vector2(scale * 0.4f + i * 0.01f, scale * 0.6f),
+                SpriteEffects.None, 0);
+
+            spriteBatch.Draw(flare, position, null, color * (0.9f + MathF.Sin(Main.GlobalTimeWrappedHourly * 2) * 0.3f),
+                rotation + MathHelper.PiOver2, flare.Size() / 2f, new Vector2(scale * 0.6f + i * 0.01f, scale * 0.3f),
+                SpriteEffects.None, 0);
+
+            spriteBatch.Draw(clock, position, null,
+                color * (0.9f + MathF.Sin(Main.GlobalTimeWrappedHourly * 2) * 0.3f) * 0.6f,
+                0, clock.Size() / 2f, scale * 0.2f + i * 0.005f,
+                SpriteEffects.None, 0);
+
+            spriteBatch.Draw(glow, position, null,
+                color * MathF.Sin(initialExplosion * MathHelper.Pi) * 0.5f,
+                0, glow.Size() / 2f, scale * initialExplosion + i * 0.005f,
+                SpriteEffects.None, 0);
+
+            spriteBatch.Draw(crosslight, position + new Vector2(-sword2.Width * 0.33f, 0).RotatedBy(rotation),
+                null, color * (0.9f + MathF.Sin(Main.GlobalTimeWrappedHourly * 4) * 0.3f) * AITimer2,
+                rotation + MathHelper.PiOver4 + Main.GameUpdateCount * 0.1f,
+                crosslight.Size() / 2f, scale * AITimer2 + i * 0.01f,
+                SpriteEffects.None, 0);
+
+            spriteBatch.Draw(flare, position + new Vector2(-sword2.Width * 0.18f * scaleX, 0).RotatedBy(rotation), null,
+                color * 1.4f, rotation, flare.Size() / 2f, new Vector2(scale * 0.7f + i * 0.01f, scale * 0.4f),
+                SpriteEffects.None, 0);
+        }
     }
 
     void DrawTentacles(SpriteBatch spriteBatch, Vector2 screenPos)

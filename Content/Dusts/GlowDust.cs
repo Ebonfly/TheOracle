@@ -25,16 +25,20 @@ public class GlowDust : ModDust
         dust.scale *= 0.98f;
         if (dust.scale <= 0)
             dust.active = false;
+
         return false;
     }
 
     public override bool PreDraw(Dust dust)
     {
-        Main.spriteBatch.Draw(Assets.Extras.slash.Value, dust.position - Main.screenPosition, null,
-            dust.color * dust.scale,
-            dust.velocity.ToRotation(), Assets.Extras.slash.Size() / 2,
-            new Vector2(MathHelper.Clamp(dust.velocity.Length(), 0, 5f), 5f) * dust.scale * 0.1f,
-            SpriteEffects.None, 0);
+        Texture2D tex = (dust.customData == null ? Assets.Extras.slash.Value : Assets.Extras.flare.Value);
+        Vector2 scale = new Vector2(MathHelper.Clamp(dust.velocity.Length(), 0, 5f), 5f);
+        if (dust.customData != null)
+            scale = Vector2.One * 5;
+        Main.spriteBatch.Draw(tex, dust.position - Main.screenPosition, null,
+            dust.color * dust.scale, dust.velocity.ToRotation(), tex.Size() / 2,
+            scale * dust.scale * 0.1f, SpriteEffects.None,
+            0);
         return false;
     }
 }

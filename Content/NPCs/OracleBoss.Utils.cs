@@ -16,6 +16,8 @@ public partial class OracleBoss : ModNPC
         AITimer = -idleTime;
         AITimer2 = 0;
         AITimer3 = 0;
+        for (int i = 0; i < NPC.localAI.Length; i++)
+            NPC.localAI[0] = 0;
         NPC.netUpdate = true;
         return move;
     }

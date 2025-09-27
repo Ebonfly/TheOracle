@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.Graphics.CameraModifiers;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheOracle.Content.Dusts;
@@ -143,14 +144,141 @@ public partial class OracleBoss : ModNPC
         return CrystalSliceDash;
     }
 
+    int DoOrbClockHandSwordForm()
+    {
+        IdleCrystal();
+        for (int i = 1; i < 4; i++)
+        {
+            if (AITimer > 10 && (int)AITimer % 3 == i - 1)
+            {
+                bool inner = Main.rand.NextBool(5);
+                Dust d = Dust.NewDustPerfect(OrbPosition[0], ModContent.DustType<GlowDust>(),
+                    (OrbPosition[i] - new Vector2(0, 40) - OrbPosition[0]).SafeNormalize(Vector2.Zero)
+                    .RotatedByRandom(0.1f) * Main.rand.NextFloat(4, 7) * (inner ? 0.2f : 1),
+                    newColor: Color.CornflowerBlue with { A = 0 }, Scale: 0.9f);
+                d.noGravity = true;
+                if (inner)
+                    d.customData = inner;
+            }
+
+            OrbPosition[i] = Vector2.Lerp(OrbPosition[i],
+                OrbPosition[0] + new Vector2(120).RotatedBy(MathHelper.TwoPi * i / 3f + ConstantTimer * 0.1f),
+                MathHelper.Clamp(AITimer / 60f, 0, 1));
+        }
+
+        if ((int)AITimer % 5 == 0 && !Main.dedServ && AITimer < 90)
+            Main.instance.CameraModifiers.Add(new PunchCameraModifier(OrbPosition[0], Main.rand.NextVector2Unit(),
+                AITimer / 10f + 2, 20, 5, 1000));
+
+        if ((int)AITimer == 94 && !Main.dedServ)
+            Main.instance.CameraModifiers.Add(new PunchCameraModifier(OrbPosition[0],
+                (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX),
+                30, 20, 20, 3000));
+
+        if (AITimer < 60)
+        {
+            OrbPosition[0] = Vector2.Lerp(OrbPosition[0], NPC.Center + new Vector2(0, 300), 0.2f);
+            NPC.velocity = Vector2.Lerp(NPC.velocity, -Vector2.UnitY * 3, 0.1f);
+        }
+        else if (AITimer < 90)
+            AITimer3 = MathHelper.Lerp(AITimer3, 1.8f, 0.05f);
+        else if (AITimer < 94)
+            AITimer3 = MathHelper.Lerp(AITimer3, 2.3f, 0.3f);
+        else
+            AITimer3 = MathHelper.Lerp(AITimer3, 2f, 0.2f);
+
+        if (AITimer > 60)
+        {
+            NPC.velocity = Vector2.Lerp(NPC.velocity, (Player.Center - new Vector2(0, 240) - NPC.Center) * 0.05f,
+                0.04f * MathHelper.Clamp((AITimer - 60) / 20f, 0, 1));
+
+            if (AITimer is > 90 and < 120)
+                OrbPosition[0] += Main.rand.NextVector2Circular(15, 15);
+            if (AITimer is > 120 and < 240)
+            {
+                OrbPosition[0] = Vector2.Lerp(OrbPosition[0],
+                    Player.Center + (OrbPosition[0] - Player.Center).SafeNormalize(Vector2.UnitX)
+                    .RotatedBy(MathF.Sin(ConstantTimer * 0.06f) * 0.05f) *
+                    (700 + MathF.Sin(ConstantTimer * 0.06f) * 100), 0.1f);
+            }
+
+            if (AITimer > 240)
+            {
+                if ((int)AITimer is 270)
+                    Projectile.NewProjectile(null, OrbPosition[0],
+                        (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX),
+                        ModContent.ProjectileType<CrystalSlice>(), 25, 0, ai2: 1);
+                if (AITimer < 270)
+                {
+                    if (AITimer < 255)
+                        AITimer2 = .5f;
+                    EyeTarget = Player.Center +
+                                (Player.Center - OrbPosition[0]).SafeNormalize(Vector2.UnitX) * 2000;
+                    OrbPosition[0] += (OrbPosition[0] - Player.Center).SafeNormalize(Vector2.UnitX) * 15 *
+                                      MathF.Sin((AITimer - 240) / 30f * MathF.PI);
+                }
+                else if ((int)AITimer == 270)
+                    Main.instance.CameraModifiers.Add(new PunchCameraModifier(OrbPosition[0],
+                        (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX),
+                        30, 20, 20, 3000));
+                else if (AITimer < 290)
+                    OrbPosition[0] += (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX) * 120;
+                else if (AITimer < 300)
+                    EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.05f);
+                else if (AITimer < 350)
+                {
+                    OrbPosition[0] = Vector2.Lerp(OrbPosition[0],
+                        Player.Center + (OrbPosition[0] - Player.Center).SafeNormalize(Vector2.UnitX)
+                        .RotatedBy(MathF.Sin(ConstantTimer * 0.06f) * 0.05f) *
+                        (700 + MathF.Sin(ConstantTimer * 0.06f) * 100), 0.1f);
+
+                    EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.1f);
+
+                    NPC.localAI[0] = (OrbPosition[0] - Player.Center).ToRotation();
+                }
+                else if (AITimer < 360)
+                    OrbPosition[0] += (OrbPosition[0] - Player.Center).SafeNormalize(Vector2.UnitX) * 25 *
+                                      MathF.Sin((AITimer - 350) / 10f * MathF.PI);
+                else if (AITimer < 366)
+                {
+                    OrbPosition[0] += (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX)
+                        .RotatedBy(MathF.Sin((AITimer - 350) / 30f) * 0.03f) * 70;
+                }
+                else if (AITimer < 400)
+                {
+                    OrbPosition[0] = Vector2.Lerp(OrbPosition[0],
+                        Player.Center +
+                        new Vector2(700 + MathF.Sin(ConstantTimer * 0.06f) * 100, 0).RotatedBy(
+                            NPC.localAI[0] + MathF.Sin(ConstantTimer * 0.06f)), 0.1f);
+
+                    EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.1f);
+                }
+                else if (AITimer < 406)
+                    OrbPosition[0] += (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX)
+                        .RotatedBy(MathF.Sin((AITimer - 350) / 30f) * 0.03f) * 70;
+                else if (AITimer < 520)
+                {
+                    OrbPosition[0] = Vector2.Lerp(OrbPosition[0],
+                        Player.Center + (OrbPosition[0] - Player.Center).SafeNormalize(Vector2.UnitX)
+                        .RotatedBy(MathF.Sin(ConstantTimer * 0.06f) * 0.05f) *
+                        (700 + MathF.Sin(ConstantTimer * 0.06f) * 100), 0.1f);
+
+                    EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.1f);
+                }
+            }
+            else
+            {
+                EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.1f);
+            }
+        }
+
+        AITimer2 = MathHelper.Lerp(AITimer2, 0, 0.1f);
+        return OrbClockHandSwordForm;
+    }
+
     int DoMagicRain()
     {
         return MagicRain;
-    }
-
-    int DoOrbClockHandSwordForm()
-    {
-        return OrbClockHandSwordForm;
     }
 
     int DoTeleportOrbWeb()

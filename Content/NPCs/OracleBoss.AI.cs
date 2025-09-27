@@ -13,14 +13,17 @@ public partial class OracleBoss : ModNPC
         ConstantTimer++;
 
         NPC.rotation = MathHelper.Clamp(NPC.velocity.X * 0.1f, -0.3f, 0.3f);
+        NPC.DiscourageDespawn(10);
         if (Main.mouseRight)
         {
             NPC.velocity = (Main.MouseWorld - NPC.Center) * 0.05f;
-            AIState = CrystalSliceDash;
+            AIState = OrbClockHandSwordForm;
             EyeTarget = Player.Center;
             AITimer = -50;
             AITimer2 = 0;
             AITimer3 = 0;
+            for (int i = 0; i < NPC.localAI.Length; i++)
+                NPC.localAI[0] = 0;
             CrystalOpacity = 1f;
             IdleOrbs();
             IdleCrystal();

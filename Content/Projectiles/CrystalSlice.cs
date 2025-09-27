@@ -48,6 +48,8 @@ public class CrystalSlice : ModProjectile
 
     public override void AI()
     {
+        if (Projectile.timeLeft > 40 && Projectile.ai[2] > 0)
+            Projectile.timeLeft = 40;
         Projectile.velocity = Projectile.velocity.SafeNormalize(Vector2.UnitX);
         Projectile.rotation = Projectile.velocity.ToRotation();
         if (Projectile.timeLeft > 40)
@@ -70,10 +72,10 @@ public class CrystalSlice : ModProjectile
 
         if (Projectile.timeLeft < 15)
         {
-            Projectile.ai[2] = MathHelper.Lerp(1, 0, Projectile.timeLeft / 15f);
+            Projectile.localAI[0] = MathHelper.Lerp(1, 0, Projectile.timeLeft / 15f);
         }
 
-        if (Projectile.timeLeft == 40)
+        if (Projectile.timeLeft == 40 && Projectile.ai[2] < 1)
         {
             SoundEngine.PlaySound(SoundID.DD2_WitherBeastCrystalImpact with { pitchVariance = 0.5f },
                 Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.UnitX) * 400);
@@ -107,7 +109,7 @@ public class CrystalSlice : ModProjectile
                 color * i * Projectile.ai[1] * Projectile.ai[0] * 4, Projectile.rotation + MathHelper.PiOver2,
                 crystalFrame.Size() / 2, new Vector2(1, 3 + i), SpriteEffects.None, 0);
 
-            color *= factor * MathF.Pow(Projectile.ai[1], 2) * 0.5f * (1 - Projectile.ai[2]);
+            color *= factor * MathF.Pow(Projectile.ai[1], 2) * 0.5f * (1 - Projectile.localAI[0]);
 
             for (int j = 0; j < 2; j++)
                 vertices.Add(PrimitiveUtils.AsVertex(
