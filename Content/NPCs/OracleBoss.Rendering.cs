@@ -46,10 +46,64 @@ public partial class OracleBoss : ModNPC
 
         DrawBody(spriteBatch, screenPos);
 
+        DrawTentacles(spriteBatch, screenPos);
+
         for (int i = 0; i < OrbPosition.Length; i++)
             spriteBatch.Draw(orbTex, OrbPosition[i] - screenPos, OrbFrame, Color.White, OrbRotation[i],
                 OrbFrame.Size() / 2, NPC.scale, SpriteEffects.None, 0);
         return false;
+    }
+
+    void DrawTentacles(SpriteBatch spriteBatch, Vector2 screenPos)
+    {
+        List<VertexPositionColorTexture>[] vertices = [new(), new(), new(), new(), new(), new()];
+        for (int i = 0; i < 6; i++)
+        {
+            int direction = (i < 3 ? 1 : -1);
+            float startOffset = ((i + 2) % 3f) * 4 * direction;
+            Vector2 start = NPC.Center +
+                new Vector2(_mainOrigin.X * 0.67f * direction + startOffset,
+                    _mainOrigin.Y * 0.115f - startOffset * direction * 0.5f).RotatedBy(NPC.rotation) - screenPos;
+
+            Vector2 end = start +
+                          new Vector2(-NPC.velocity.X * 4, 40 - MathHelper.Clamp(NPC.velocity.Y * 4, -70, 70))
+                              .RotatedBy(
+                                  i % 3f * 0.3f * -direction);
+
+            Vector2 halfway = Vector2.SmoothStep(start, end, 0.5f) +
+                              new Vector2((i < 3 ? 1 : -1), 0).RotatedBy(NPC.rotation) * 10;
+
+            for (float j = 0; j < 1f; j += 0.1f)
+            {
+                Vector2 pos = Vector2.Lerp(Vector2.Lerp(start, halfway, j * 2), Vector2.Lerp(halfway, end, j * 2), j);
+                Color col = Color.CornflowerBlue * MathF.Pow(1 - j, 2) *
+                            (1f + MathF.Sin(Main.GlobalTimeWrappedHourly * 10) * 0.2f) *
+                            MathHelper.Lerp(0, 1, MathHelper.Clamp(j * 10, 0, 1));
+                Vector2 offset = new Vector2(20, 0).RotatedBy((end - start).ToRotation());
+                vertices[i].Add(PrimitiveUtils.AsVertex(pos + offset.RotatedBy(MathHelper.PiOver2), col,
+                    new Vector2(-j + Main.GlobalTimeWrappedHourly * 2, 0)));
+                vertices[i].Add(PrimitiveUtils.AsVertex(pos + offset.RotatedBy(-MathHelper.PiOver2), col,
+                    new Vector2(-j + Main.GlobalTimeWrappedHourly * 2, 1)));
+            }
+        }
+
+        spriteBatch.End(out var ss);
+        spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointWrap,
+            ss.depthStencilState, RasterizerState.CullNone, null, ss.matrix);
+
+        for (int i = 0; i < 6; i++)
+        {
+            if (vertices[i].Count > 2)
+            {
+                PrimitiveUtils.DrawTexturedPrimitives(vertices[i].ToArray(), PrimitiveType.TriangleStrip,
+                    Assets.Extras.LintyTrail);
+                PrimitiveUtils.DrawTexturedPrimitives(vertices[i].ToArray(), PrimitiveType.TriangleStrip,
+                    Assets.Extras.Tentacle);
+            }
+        }
+
+        spriteBatch.End();
+        spriteBatch.Begin(ss);
     }
 
     void DrawJet(SpriteBatch spriteBatch, Vector2 screenPos)

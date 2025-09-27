@@ -56,13 +56,18 @@ public partial class OracleBoss : ModNPC
     int DoCrystalSliceDash()
     {
         IdleOrbs();
-        EyeTarget = CrystalPosition;
         if (AITimer < 2)
             NPC.velocity = Vector2.Zero;
         if (AITimer < 30)
+        {
+            EyeTarget = Vector2.Lerp(EyeTarget, CrystalPosition, AITimer / 30f);
             NPC.velocity.Y -= 0.05f;
+        }
         else
+        {
+            EyeTarget = CrystalPosition;
             NPC.velocity *= 0.95f;
+        }
 
         if (AITimer < 40)
             IdleCrystal();
@@ -86,40 +91,35 @@ public partial class OracleBoss : ModNPC
 
         if (AITimer > 140)
         {
-            if (AITimer < 170)
+            if (AITimer < 150)
                 CrystalRotation =
                     CrystalRotation.AngleLerp((Player.Center - CrystalPosition).ToRotation() + MathHelper.PiOver2,
-                        0.1f);
-            else if ((int)AITimer == 170)
+                        MathHelper.Lerp(0.2f, 0.5f, (AITimer - 140f) / 10f));
+
+            if ((int)AITimer == 150)
                 Projectile.NewProjectile(null, CrystalPosition, CrystalTipDirection,
                     ModContent.ProjectileType<CrystalSlice>(), 25, 0);
+
             else if (AITimer < 190)
                 CrystalPosition -= CrystalTipDirection * MathF.Sin(MathF.Pow((AITimer - 170) / 20f, 2) * MathHelper.Pi);
-            else if (AITimer < 220)
+            else if (AITimer < 200)
             {
                 CrystalPosition += CrystalTipDirection *
                                    MathHelper.SmoothStep(100, 20, MathHelper.Clamp((AITimer - 190) / 10f, 0, 1));
-                if (AITimer < 200)
-                    CrystalOpacity = MathHelper.SmoothStep(1, 0, (AITimer - 190) / 10f);
+                CrystalOpacity = MathHelper.SmoothStep(1, 0, (AITimer - 190) / 10f);
             }
-            else if ((int)AITimer == 220)
+            else if (AITimer < 250)
             {
                 CrystalOpacity = 0;
-                for (int i = -3; i < 4; i++)
-                    Projectile.NewProjectile(null, CrystalPosition + CrystalTipDirection.RotatedBy(-i * 0.2f) * 400,
-                        -CrystalTipDirection.RotatedBy(i * 0.2f),
+                if (AITimer % 4 == 0)
+                {
+                    Vector2 position = Player.Center + Main.rand.NextVector2CircularEdge(800, 800);
+                    Projectile.NewProjectile(null, position,
+                        (Player.Center - position).SafeNormalize(Vector2.UnitX).RotatedByRandom(0.6f),
                         ModContent.ProjectileType<CrystalSlice>(), 25, 0);
+                }
             }
             else if ((int)AITimer == 270)
-            {
-                for (int i = -6; i < 7; i++)
-                    Projectile.NewProjectile(null,
-                        CrystalPosition - CrystalTipDirection.RotatedBy(i * 0.05f) * 2000 +
-                        CrystalTipDirection.RotatedBy(-i * 0.1f) * 400,
-                        CrystalTipDirection.RotatedBy(-i * 0.15f),
-                        ModContent.ProjectileType<CrystalSlice>(), 25, 0);
-            }
-            else if ((int)AITimer == 300)
             {
                 Vector2 usualPos = NPC.Center - new Vector2(IdleSwayFactor * 6,
                         NPC.height * 0.28f - MathF.Sin(MathF.Abs(IdleSwayFactor) * MathHelper.Pi) * 6)

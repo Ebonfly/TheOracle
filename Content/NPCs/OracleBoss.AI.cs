@@ -15,9 +15,10 @@ public partial class OracleBoss : ModNPC
         NPC.rotation = MathHelper.Clamp(NPC.velocity.X * 0.1f, -0.3f, 0.3f);
         if (Main.mouseRight)
         {
-            NPC.velocity = (Main.MouseWorld - NPC.Center) * 0.01f;
+            NPC.velocity = (Main.MouseWorld - NPC.Center) * 0.05f;
             AIState = CrystalSliceDash;
-            AITimer = 0;
+            EyeTarget = Player.Center;
+            AITimer = -50;
             AITimer2 = 0;
             AITimer3 = 0;
             CrystalOpacity = 1f;
@@ -30,10 +31,12 @@ public partial class OracleBoss : ModNPC
         if (AITimer < 0)
         {
             CrystalOpacity = MathHelper.Lerp(CrystalOpacity, 1f, IdleSpeed);
-            EyeTarget = Player.Center;
+            EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, IdleSpeed);
             IdleSpeed = MathHelper.Lerp(IdleSpeed, 1f, 0.1f);
             IdleCrystal(IdleSpeed);
             IdleOrbs(IdleSpeed);
+            if (AITimer > -30)
+                NPC.velocity *= MathHelper.Lerp(0.98f, 0, (AITimer + 30) / 30f);
         }
         else
         {

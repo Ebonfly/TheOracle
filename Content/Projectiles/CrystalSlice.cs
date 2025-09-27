@@ -17,12 +17,17 @@ public class CrystalSlice : ModProjectile
 {
     public override string Texture => QuickAssets.EMPTY_KEY;
 
+    public override void SetStaticDefaults()
+    {
+        ProjectileID.Sets.DrawScreenCheckFluff[Type] = 1000;
+    }
+
     public override void SetDefaults()
     {
         Projectile.Size = new(16);
         Projectile.tileCollide = false;
         Projectile.penetrate = -1;
-        Projectile.timeLeft = 50;
+        Projectile.timeLeft = 80;
         Projectile.aiStyle = -1;
         Projectile.ignoreWater = true;
         Projectile.hostile = true;
@@ -46,14 +51,35 @@ public class CrystalSlice : ModProjectile
         Projectile.velocity = Projectile.velocity.SafeNormalize(Vector2.UnitX);
         Projectile.rotation = Projectile.velocity.ToRotation();
         if (Projectile.timeLeft > 40)
-            Projectile.ai[0] = MathHelper.Lerp(1, 0, (Projectile.timeLeft - 40) / 10f);
+            Projectile.ai[0] = MathHelper.Lerp(1, 0, MathHelper.Clamp((Projectile.timeLeft - 60) / 20f, 0, 1));
         else if (Projectile.timeLeft > 10)
         {
+            if (Projectile.timeLeft < 15)
+                for (int i = 0; i < 3; i++)
+                    Dust.NewDustPerfect(Projectile.Center +
+                                        Projectile.velocity * Main.rand.NextFloat(100, 1000) +
+                                        Main.rand.NextVector2Circular(4, 4), ModContent.DustType<GlowDust>(),
+                        Projectile.velocity.RotatedByRandom(.2f) * Main.rand.NextFloat(1, 3),
+                        newColor: Color.White with { A = 0 } * 0.6f).noGravity = true;
+
             Projectile.ai[1] = MathHelper.SmoothStep(1, 0, (Projectile.timeLeft - 10) / 30f);
             Projectile.ai[0] = MathHelper.Lerp(0, 1, (Projectile.timeLeft - 10) / 30f);
         }
         else if (Projectile.timeLeft < 8)
             Projectile.ai[1] = MathHelper.Lerp(0, 1, Projectile.timeLeft / 7f);
+
+        if (Projectile.timeLeft < 15)
+        {
+            Projectile.ai[2] = MathHelper.Lerp(1, 0, Projectile.timeLeft / 15f);
+        }
+
+        if (Projectile.timeLeft == 40)
+        {
+            SoundEngine.PlaySound(SoundID.DD2_WitherBeastCrystalImpact with { pitchVariance = 0.5f },
+                Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.UnitX) * 400);
+            SoundEngine.PlaySound(SoundID.DD2_BetsysWrathShot with { pitchVariance = 0.5f },
+                Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.UnitX) * 400);
+        }
     }
 
     public override bool PreDraw(ref Color lightColor)
@@ -81,20 +107,20 @@ public class CrystalSlice : ModProjectile
                 color * i * Projectile.ai[1] * Projectile.ai[0] * 4, Projectile.rotation + MathHelper.PiOver2,
                 crystalFrame.Size() / 2, new Vector2(1, 3 + i), SpriteEffects.None, 0);
 
-            color *= factor * Projectile.ai[1] * 0.5f;
+            color *= factor * MathF.Pow(Projectile.ai[1], 2) * 0.5f * (1 - Projectile.ai[2]);
 
             for (int j = 0; j < 2; j++)
                 vertices.Add(PrimitiveUtils.AsVertex(
-                    position + new Vector2(14, 0).RotatedBy(
+                    position + new Vector2(4, 0).RotatedBy(
                         Projectile.rotation + MathHelper.PiOver2 * (j == 0 ? -1 : 1)),
-                    color, new Vector2(j, j)));
+                    color * 3, new Vector2(j, j)));
 
             position = Vector2.Lerp(start, end, i);
             color = Color.Lerp(Color.CornflowerBlue, Color.White, factor) with { A = 0 };
-            color *= factor * Projectile.ai[0] * 0.2f;
+            color *= factor * Projectile.ai[0] * 0.6f;
             for (int j = 0; j < 2; j++)
                 verticesTelegraph.Add(PrimitiveUtils.AsVertex(
-                    position + new Vector2(4, 0).RotatedBy(
+                    position + new Vector2(2, 0).RotatedBy(
                         Projectile.rotation + MathHelper.PiOver2 * (j == 0 ? -1 : 1)),
                     color, new Vector2(j, j)));
         }
