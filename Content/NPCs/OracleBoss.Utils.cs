@@ -18,6 +18,7 @@ public partial class OracleBoss : ModNPC
         AITimer3 = 0;
         for (int i = 0; i < NPC.localAI.Length; i++)
             NPC.localAI[0] = 0;
+        DisposablePosition = Vector2.Zero;
         NPC.netUpdate = true;
         return move;
     }
@@ -62,5 +63,16 @@ public partial class OracleBoss : ModNPC
         }
 
         _cachedEyeOffsets[0] = target;
+    }
+
+    public void SaveOldOrbPosition(int orbIndex)
+    {
+        for (int i = OldOrbPosition.GetLength(1) - 1; i > 0; i--)
+        {
+            OldOrbPosition[orbIndex, i] =
+                Vector2.Lerp(OldOrbPosition[orbIndex, i], OldOrbPosition[orbIndex, i - 1], 0.1f);
+        }
+
+        OldOrbPosition[orbIndex, 0] = OrbPosition[orbIndex];
     }
 }

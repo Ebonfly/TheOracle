@@ -14,6 +14,10 @@ public partial class OracleBoss : ModNPC
 
         NPC.rotation = MathHelper.Clamp(NPC.velocity.X * 0.1f, -0.3f, 0.3f);
         NPC.DiscourageDespawn(10);
+
+        for (int i = 0; i < OrbPosition.Length; i++)
+            SaveOldOrbPosition(i);
+
         if (Main.mouseRight)
         {
             NPC.velocity = (Main.MouseWorld - NPC.Center) * 0.05f;
@@ -21,6 +25,7 @@ public partial class OracleBoss : ModNPC
             EyeTarget = Player.Center;
             AITimer = -50;
             AITimer2 = 0;
+            DisposablePosition = Vector2.Zero;
             AITimer3 = 0;
             for (int i = 0; i < NPC.localAI.Length; i++)
                 NPC.localAI[0] = 0;

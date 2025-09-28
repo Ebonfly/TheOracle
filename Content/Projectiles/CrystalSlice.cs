@@ -48,12 +48,21 @@ public class CrystalSlice : ModProjectile
 
     public override void AI()
     {
-        if (Projectile.timeLeft > 40 && Projectile.ai[2] > 0)
+        if (Projectile.timeLeft > 40 && Projectile.ai[2] is > 0 and < 2)
             Projectile.timeLeft = 40;
+
+        if (Projectile.timeLeft > 50 && Projectile.ai[2] > 2)
+            Projectile.timeLeft = 50;
+
         Projectile.velocity = Projectile.velocity.SafeNormalize(Vector2.UnitX);
         Projectile.rotation = Projectile.velocity.ToRotation();
         if (Projectile.timeLeft > 40)
-            Projectile.ai[0] = MathHelper.Lerp(1, 0, MathHelper.Clamp((Projectile.timeLeft - 60) / 20f, 0, 1));
+        {
+            if (Projectile.ai[2] > 2)
+                Projectile.ai[0] = MathHelper.Lerp(Projectile.ai[0], 1, 0.14f);
+            else
+                Projectile.ai[0] = MathHelper.Lerp(1, 0, MathHelper.Clamp((Projectile.timeLeft - 60) / 20f, 0, 1));
+        }
         else if (Projectile.timeLeft > 10)
         {
             if (Projectile.timeLeft < 15)

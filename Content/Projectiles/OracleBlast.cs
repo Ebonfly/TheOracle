@@ -1,0 +1,40 @@
+namespace TheOracle.Content.Projectiles;
+
+public class OracleBlast : ModProjectile
+{
+    public override string Texture => "TheOracle/Assets/Images/Projectiles/OracleBlast";
+
+    public override void SetStaticDefaults()
+    {
+        Main.projFrames[Type] = 4;
+    }
+
+    public override void SetDefaults()
+    {
+        Projectile.aiStyle = -1;
+        Projectile.Size = new(33);
+        Projectile.timeLeft = 360;
+        Projectile.friendly = false;
+        Projectile.hostile = true;
+        Projectile.tileCollide = false;
+    }
+
+    public override bool PreDraw(ref Color lightColor)
+    {
+        Texture2D tex = TextureAssets.Projectile[Type].Value;
+        Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, tex.Frame(1, 4, 0, Projectile.frame),
+            Color.White with { A = 0 }, Projectile.rotation, new Vector2(65, 35) / 2, Projectile.scale,
+            SpriteEffects.None, 0);
+        return false;
+    }
+
+    public override void AI()
+    {
+        Lighting.AddLight(Projectile.Center, TorchID.White);
+        if (++Projectile.frameCounter % 5 == 0)
+            if (++Projectile.frame > 3)
+                Projectile.frame = 0;
+
+        Projectile.rotation = Projectile.velocity.ToRotation();
+    }
+}

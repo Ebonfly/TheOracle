@@ -73,11 +73,28 @@ public partial class OracleBoss : ModNPC
         float rotation = (EyeTarget - OrbPosition[0]).ToRotation() + MathHelper.Pi;
 
         float aura = (Main.GlobalTimeWrappedHourly * 0.5f) % 1f;
-        float initialExplosion = MathHelper.Clamp((AITimer - 60f) / 50f, 0, 1); // change later 
 
         for (int i = 0; i < 2; i++)
         {
             Color color = (i == 0 ? Color.White : Color.CornflowerBlue) with { A = 0 } * scaleX;
+
+            if (NPC.localAI[2] > 0)
+            {
+                for (int j = 0; j < OldOrbPosition.GetLength(1); j++)
+                {
+                    float oldRotation = (EyeTarget - OldOrbPosition[0, j]).ToRotation() + MathHelper.Pi;
+                    float mult = (1 - j / (float)OldOrbPosition.GetLength(1)) * NPC.localAI[2];
+
+                    spriteBatch.Draw(sword, OldOrbPosition[0, j] - screenPos, null, color * 0.4f * mult,
+                        oldRotation + MathHelper.Pi,
+                        new Vector2(84, sword.Height / 2f),
+                        new Vector2(scaleX, scale * scale + i * 0.07f) * 0.5f, SpriteEffects.None, 0);
+
+                    spriteBatch.Draw(sword2, OldOrbPosition[0, j] - screenPos, null, color * 0.2f * mult, oldRotation,
+                        new Vector2(84, sword2.Height / 2f),
+                        new Vector2(scaleX, scale * scale + i * 0.07f) * 0.5f, SpriteEffects.None, 0);
+                }
+            }
 
             spriteBatch.Draw(sword, position, null, color * 0.1f * MathF.Sin(aura * MathHelper.Pi),
                 rotation + MathHelper.Pi, new Vector2(84, sword.Height / 2f),
@@ -109,8 +126,8 @@ public partial class OracleBoss : ModNPC
                 SpriteEffects.None, 0);
 
             spriteBatch.Draw(glow, position, null,
-                color * MathF.Sin(initialExplosion * MathHelper.Pi) * 0.5f,
-                0, glow.Size() / 2f, scale * initialExplosion + i * 0.005f,
+                color * MathF.Sin(NPC.localAI[1] * MathHelper.Pi) * 0.5f,
+                0, glow.Size() / 2f, scale * 1.4f * NPC.localAI[1] + i * 0.005f,
                 SpriteEffects.None, 0);
 
             spriteBatch.Draw(crosslight, position + new Vector2(-sword2.Width * 0.33f, 0).RotatedBy(rotation),

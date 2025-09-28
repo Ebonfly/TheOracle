@@ -15,6 +15,7 @@ public partial class OracleBoss : ModNPC
 
     Vector2[] _cachedEyeOffsets = new Vector2[5];
     public Vector2 EyeTarget;
+    public Vector2 DisposablePosition;
 
     public Vector2 CrystalPosition;
     public float CrystalRotation;
@@ -22,6 +23,7 @@ public partial class OracleBoss : ModNPC
     private const int OrbAmount = 4;
     public float[] OrbRotation = new float[OrbAmount];
     public Vector2[] OrbPosition = new Vector2[OrbAmount];
+    public Vector2[,] OldOrbPosition = new Vector2[OrbAmount, 5];
     public float IdleSpeed = 1f;
     public int ConstantTimer;
     public ref float AIState => ref NPC.ai[0];
