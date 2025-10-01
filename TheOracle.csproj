@@ -22,13 +22,19 @@
         <Folder Include="Assets\Music\"/>
         <Folder Include="Common\Utils\"/>
     </ItemGroup>
-    
+
+
     <ItemGroup Condition="'$(DesignTimeBuild)' != 'true'">
-        <EffectFiles Include="**/*.hlsl"/>
-        <EffectFiles Include="**/*.fx"/>
+        <EffectFiles Include="**/*.hlsl" />
+        <EffectFiles Include="**/*.fx" />
     </ItemGroup>
-    <Target Name="BuildEffects" BeforeTargets="BuildMod" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
-        <Exec Command="@(EffectFiles->'&quot;./Assets/Effects/Compiler/fxc.exe&quot; &quot;%(RecursiveDir)%(FileName)%(Extension)&quot; /T fx_2_0 /nologo /Fo &quot;%(RecursiveDir)%(FileName).fxc&quot; &#xA;&#xD;')" IgnoreExitCode="true"/>
+
+    <Target Name="BuildEffects" BeforeTargets="BuildMod">
+        <Exec Condition="$([MSBuild]::IsOSPlatform('Windows'))"
+              Command="@(EffectFiles->'&quot;./Assets/Effects/Compiler/fxc.exe&quot; &quot;%(RecursiveDir)%(FileName)%(Extension)&quot; /T fx_2_0 /nologo /Fo &quot;%(RecursiveDir)%(FileName).fxc&quot; &#xA;&#xD;')" IgnoreExitCode="true" />
+
+        <Exec Condition="$([MSBuild]::IsOSPlatform('Linux'))"
+              Command="@(EffectFiles->'wine &quot;./Assets/Effects/Compiler/fxc.exe&quot; &quot;%(RecursiveDir)%(FileName)%(Extension)&quot; /T fx_2_0 /nologo /Fo &quot;%(RecursiveDir)%(FileName).fxc&quot; &#xA;&#xD;')" IgnoreExitCode="true" />
     </Target>
 
 </Project>
