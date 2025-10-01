@@ -10,8 +10,7 @@
 
     <!-- References -->
     <ItemGroup>
-        <PackageReference Include="AssGen" Version="3.0.0"/>
-        <PackageReference Include="AssGen" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+        <PackageReference Include="AssGen" Version="3.0.1" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
         <PackageReference Include="Krafs.Publicizer" PrivateAssets="true" Version="2.2.1"/>
         <Publicize Include="tModLoader" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false"/>
         <Publicize Include="tModLoader;FNA" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false"/>
