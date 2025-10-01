@@ -35,7 +35,8 @@ public class OracleJetBeam : ModProjectile
     {
         float a = 0;
         return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center,
-            Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.UnitX) * 1200, 40, ref a);
+            Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.UnitX) *
+            ((int)Projectile.ai[2] == 1 ? 2700 : 1200), 40, ref a);
     }
 
     public override bool ShouldUpdatePosition() => false;
