@@ -6,4 +6,5 @@ Projectiles: {
 	OracleJetBeam.DisplayName: Oracle Jet Beam
 	CrystalSlice.DisplayName: Crystal Slice
 	OracleBlast.DisplayName: Oracle Blast
+	Flare.DisplayName: Flare
 }
