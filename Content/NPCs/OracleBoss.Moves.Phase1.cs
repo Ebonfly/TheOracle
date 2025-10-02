@@ -463,6 +463,42 @@ public partial class OracleBoss : ModNPC
 
     int DoTeleportOrbWeb()
     {
+        if (AITimer < 60)
+        {
+            EyeTarget = Vector2.Lerp(EyeTarget, NPC.Center, 0.1f);
+            Vector2 pos = NPC.Center +
+                          Main.rand.NextVector2Unit() * 700;
+            for (int i = 0; i < 3; i++)
+                Dust.NewDustPerfect(pos, ModContent.DustType<GlowDust>(),
+                    (NPC.Center - pos).SafeNormalize(Vector2.Zero) * 16,
+                    newColor: Color.CornflowerBlue with { A = 0 }, Scale: 0.9f).noGravity = true;
+        }
+        else if (AITimer < 180)
+        {
+            if (AITimer > 120)
+                EyeTarget = Vector2.Lerp(EyeTarget, NPC.Center + new Vector2(300, 0).RotatedBy(ConstantTimer * 0.3f),
+                    0.1f);
+            if (AITimer % 7 == 0)
+            {
+                Vector2 pos = Player.Center + new Vector2(500, 225).RotatedBy(ConstantTimer) *
+                    Main.rand.NextFloat(0.5f, 1.5f) * (AITimer % 20 == 0 ? -1 : 1);
+                if (DisposablePosition == Vector2.Zero)
+                    DisposablePosition = pos;
+                Vector2 vel = Main.rand.NextVector2Unit() * 0.6f;
+                Vector2 cachePos = DisposablePosition;
+                if (DisposablePosition != Vector2.Zero)
+                    DisposablePosition = pos;
+
+                Projectile.NewProjectile(null, DisposablePosition, vel,
+                    ModContent.ProjectileType<WebBeam>(),
+                    25, 0, -1, cachePos.X, cachePos.Y, 480 - AITimer);
+            }
+        }
+        else
+        {
+            EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.05f);
+        }
+
         return TeleportOrbWeb;
     }
 

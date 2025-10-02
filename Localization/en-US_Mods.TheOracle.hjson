@@ -1,4 +1,4 @@
-NPCs.OracleBoss.DisplayName: Oracle Boss
+NPCs.OracleBoss.DisplayName: The Oracle
 
 Projectiles: {
 	OracleMiniClock.DisplayName: Oracle Mini Clock
@@ -7,4 +7,5 @@ Projectiles: {
 	CrystalSlice.DisplayName: Crystal Slice
 	OracleBlast.DisplayName: Oracle Blast
 	Flare.DisplayName: Flare
+	WebBeam.DisplayName: Web Beam
 }
