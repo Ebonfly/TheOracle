@@ -504,6 +504,29 @@ public partial class OracleBoss : ModNPC
 
     int DoSweepingProjectilesThatReverse()
     {
+        IdleOrbs();
+        IdleCrystal();
+        if (AITimer < 10)
+            EyeTarget = Player.Center;
+        else
+            EyeTarget = Vector2.Lerp(EyeTarget, NPC.Center, 0.1f);
+        if ((int)AITimer == 30)
+        {
+            Projectile.NewProjectile(null, NPC.Center, Vector2.Zero, ModContent.ProjectileType<TimeReverseVFX>(), 0, 0,
+                ai0: 2);
+        }
+
+        if (AITimer is > 75 and < 150 && (int)AITimer % 2 == 0)
+        {
+            Projectile.NewProjectile(null, NPC.Center, Main.rand.NextVector2Unit(),
+                ModContent.ProjectileType<OracleBlastReversal>(), 25, 0);
+        }
+
+        if ((int)AITimer == 300)
+        {
+            Projectile.NewProjectile(null, NPC.Center, Vector2.Zero, ModContent.ProjectileType<TimeReverseVFX>(), 0, 0);
+        }
+
         return SweepingProjectilesThatReverse;
     }
 

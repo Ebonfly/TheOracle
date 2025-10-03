@@ -8,4 +8,6 @@ Projectiles: {
 	OracleBlast.DisplayName: Oracle Blast
 	Flare.DisplayName: Flare
 	WebBeam.DisplayName: Web Beam
+	OracleBlastReversal.DisplayName: Oracle Blast Reversal
+	TimeReverseVFX.DisplayName: Time Reverse V F X
 }
