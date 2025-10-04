@@ -504,7 +504,11 @@ public partial class OracleBoss : ModNPC
 
     int DoSweepingProjectilesThatReverse()
     {
-        IdleOrbs();
+        for (int i = 0; i < 4; i++)
+            OrbPosition[i] = Vector2.Lerp(OrbPosition[i],
+                NPC.Center +
+                new Vector2(120 + MathF.Sin(ConstantTimer) * 20).RotatedBy(ConstantTimer * 0.1f +
+                                                                           MathHelper.TwoPi * i / 4f), 0.1f);
         IdleCrystal();
         if (AITimer < 10)
             EyeTarget = Player.Center;
@@ -532,6 +536,69 @@ public partial class OracleBoss : ModNPC
 
     int DoLaserRefraction()
     {
+        if (AITimer < 100)
+        {
+            IdleOrbs();
+            EyeTarget = Vector2.Lerp(EyeTarget, NPC.Center, 0.1f);
+        }
+        else
+        {
+            EyeTarget = Vector2.Lerp(EyeTarget, CrystalPosition, 0.1f);
+            for (int i = 0; i < 4; i++)
+                OrbPosition[i] = Vector2.Lerp(OrbPosition[i],
+                    NPC.Center - new Vector2(0, 300) +
+                    new Vector2(200 * MathF.Sin(ConstantTimer * 0.1f + MathHelper.TwoPi * i / 8f),
+                        MathF.Sin(ConstantTimer * 0.1f + MathHelper.TwoPi * i / 4f) * 150),
+                    0.05f);
+        }
+
+        CrystalPosition = Vector2.Lerp(CrystalPosition,
+            NPC.Center - new Vector2(0, 300) + new Vector2(10).RotatedBy(ConstantTimer * 0.02f), 0.1f);
+        CrystalRotation = CrystalRotation.AngleLerp(MathF.Sin(ConstantTimer * 0.02f) * -0.2f, 0.1f);
+        if ((int)AITimer == 30)
+        {
+            Projectile.NewProjectile(null, NPC.Center, Vector2.Zero,
+                ModContent.ProjectileType<WebBeam>(),
+                25, 0, -1, CrystalPosition.X, CrystalPosition.Y, 100);
+        }
+
+        if (AITimer is > 30 and < 65)
+        {
+            Vector2 pos = CrystalPosition +
+                          Main.rand.NextVector2Unit() * 700;
+            for (int i = 0; i < 3; i++)
+                Dust.NewDustPerfect(pos, ModContent.DustType<GlowDust>(),
+                    (CrystalPosition - pos).SafeNormalize(Vector2.Zero) * 16,
+                    newColor: Color.CornflowerBlue with { A = 0 }, Scale: 0.9f).noGravity = true;
+        }
+
+        if (AITimer is > 110 and <= 120)
+        {
+            CrystalFlash = 2;
+            Projectile.NewProjectile(null, Vector2.Lerp(NPC.Center, CrystalPosition, (AITimer - 110) / 10f),
+                Vector2.Zero, ModContent.ProjectileType<Flare>(), 0, 0);
+        }
+
+        if (AITimer is > 120 and < 130)
+        {
+            CrystalFlash = 2;
+            Projectile.NewProjectile(null, CrystalPosition + Main.rand.NextVector2Circular(50, 50),
+                Vector2.Zero, ModContent.ProjectileType<Flare>(), 0, 0);
+        }
+
+        if (AITimer is > 150 and < 300 && (int)AITimer % 3 == 0)
+        {
+            Vector2 pos = CrystalPosition + Main.rand.NextVector2CircularEdge(1700, 1700);
+            Projectile.NewProjectile(null, CrystalPosition, Vector2.Zero,
+                ModContent.ProjectileType<WebBeam>(),
+                25, 0, -1, pos.X, pos.Y, 200);
+        }
+
+        if (AITimer is > 90 and < 330 && (int)AITimer % 10 == 0)
+            Projectile.NewProjectile(null, NPC.Center, Vector2.Zero,
+                ModContent.ProjectileType<WebBeam>(),
+                25, 0, -1, CrystalPosition.X, CrystalPosition.Y, 100);
+
         return LaserRefraction;
     }
 }
