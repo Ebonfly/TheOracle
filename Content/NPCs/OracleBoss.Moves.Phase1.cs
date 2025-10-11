@@ -601,4 +601,78 @@ public partial class OracleBoss : ModNPC
 
         return LaserRefraction;
     }
+
+    int DoHourGlassOrbs()
+    {
+        if (AITimer < 60)
+        {
+            CrystalPosition = Vector2.Lerp(CrystalPosition, Player.Center - new Vector2(0, 300), 0.1f);
+            for (int i = 0; i < 4; i++)
+                OrbPosition[i] = Vector2.Lerp(OrbPosition[i],
+                    Player.Center - new Vector2(0, 300) + new Vector2(100).RotatedBy(MathHelper.TwoPi * i / 4f +
+                        MathHelper.ToRadians(ConstantTimer * AITimer * 0.1f)), 0.1f);
+        }
+
+        return HourGlassOrbs;
+    }
+
+    int DoGiantClockLaser()
+    {
+        return GiantClockLaser;
+    }
+
+    int DoMagolorFields()
+    {
+        return MagolorFields;
+    }
+
+    int DoSigilCannonballs()
+    {
+        return SigilCannonballs;
+    }
+
+    int DoHourGlassFall()
+    {
+        return HourGlassFall;
+    }
+
+    int DoPolaritiesClocks()
+    {
+        return PolaritiesClocks;
+    }
+
+    int DoHourGlassSand()
+    {
+        return HourGlassSand;
+    }
+
+    int DoOrbElectricity()
+    {
+        return OrbElectricity;
+    }
+
+    int DoQuartzWatch()
+    {
+        return QuartzWatch;
+    }
+
+    int DoElfilisOrbClones()
+    {
+        return ElfilisOrbClones;
+    }
+
+    int DoBuzzsawClockOrbs()
+    {
+        return BuzzsawClockOrbs;
+    }
+
+    int DoCrystalCrackHoming()
+    {
+        return CrystalCrackHoming;
+    }
+
+    int DoOrbLaserRain()
+    {
+        return OrbLaserRain;
+    }
 }

@@ -90,9 +90,9 @@ public class WebBeam : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D flare = Assets.Extras.crosslight.Value;
-        Texture2D lensflare = Assets.Extras.lensflare.Value;
-        Texture2D beam = Assets.Extras.wavyLaser.Value;
+        Texture2D flare = Images.Extras.Textures.Crosslight.Value;
+        Texture2D lensflare = Images.Extras.Textures.Lensflare.Value;
+        Texture2D beam = Images.Extras.Textures.WavyLaser.Value;
 
 
         for (int j = 0; j < 2; j++)

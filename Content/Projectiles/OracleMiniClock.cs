@@ -102,13 +102,13 @@ public class OracleMiniClock : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D glow = Assets.Extras.glow.Value;
-        Texture2D lensflare = Assets.Extras.lensflare.Value;
-        Texture2D clock = Assets.Extras.clock_premult.Value;
-        Texture2D clockHand1 = Assets.Extras.clockHand1_premult.Value;
-        Texture2D clockHand2 = Assets.Extras.clockHand2_premult.Value;
-        Texture2D twirl = Assets.Extras.twirl_03.Value;
-        Texture2D flare = Assets.Extras.crosslight.Value;
+        Texture2D glow = Images.Extras.Textures.Glow.Value;
+        Texture2D lensflare = Images.Extras.Textures.Lensflare.Value;
+        Texture2D clock = Images.Extras.Textures.Clock.Value;
+        Texture2D clockHand1 = Images.Extras.Textures.ClockHandShortAlt.Value;
+        Texture2D clockHand2 = Images.Extras.Textures.ClockHandLongAlt.Value;
+        Texture2D twirl = Images.Extras.Textures.Twirl[2].Value;
+        Texture2D flare = Images.Extras.Textures.Crosslight.Value;
 
         for (int i = 0; i < 2; i++)
         {

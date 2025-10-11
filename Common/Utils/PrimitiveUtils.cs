@@ -77,7 +77,7 @@ public static class PrimitiveUtils
     {
         if (vertices.Length < 6) return;
         GraphicsDevice device = Main.graphics.GraphicsDevice;
-        Effect effect = TheOracle.TrailShader.Value;
+        Effect effect = Effects.TrailShader.Value;
         effect.Parameters["WorldViewProjection"].SetValue(GetMatrix());
         effect.CurrentTechnique.Passes["Default"].Apply();
         if (drawBacksides)
@@ -111,7 +111,7 @@ public static class PrimitiveUtils
         Texture2D texture, bool drawBacksides = false, bool actualColor = false, bool unscaled = false)
     {
         GraphicsDevice device = Main.graphics.GraphicsDevice;
-        Effect effect = TheOracle.TrailShader.Value;
+        Effect effect = Effects.TrailShader.Value;
         effect.Parameters["WorldViewProjection"].SetValue(unscaled ? GetMatrixUnscaled() : GetMatrix());
         effect.Parameters["tex"].SetValue(texture);
         effect.Parameters["useActualCol"].SetValue(actualColor);

@@ -44,10 +44,10 @@ public class TimeReverseVFX : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D glow = Assets.Extras.glow.Value;
-        Texture2D clock = Assets.Extras.clock_premult.Value;
-        Texture2D clockHand1 = Assets.Extras.clockHand1_premult.Value;
-        Texture2D clockHand2 = Assets.Extras.clockHand2_premult.Value;
+        Texture2D glow = Images.Extras.Textures.Glow.Value;
+        Texture2D clock = Images.Extras.Textures.Clock.Value;
+        Texture2D clockHand1 = Images.Extras.Textures.ClockHandShortAlt.Value;
+        Texture2D clockHand2 = Images.Extras.Textures.ClockHandLongAlt.Value;
 
         float alpha = MathF.Sin(Utils.GetLerpValue(160, 0, Projectile.timeLeft) *
                                 MathHelper.Pi);

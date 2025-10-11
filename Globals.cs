@@ -11,4 +11,5 @@ global using Terraria.Localization;
 global using Terraria.ModLoader;
 global using Terraria.UI;
 global using Terraria.Utilities;
-using System;
+global using Images = TheOracle.GeneratedAssets.Images;
+global using Effects = TheOracle.GeneratedAssets.Effects;

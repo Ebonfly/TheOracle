@@ -39,7 +39,20 @@ public partial class OracleBoss : ModNPC
         MagicRain = 4,
         TeleportOrbWeb = 5,
         SweepingProjectilesThatReverse = 6,
-        LaserRefraction = 7;
+        LaserRefraction = 7,
+        HourGlassOrbs = 8, // #22 
+        GiantClockLaser = 9,
+        MagolorFields = 10,
+        SigilCannonballs = 11, // #12
+        HourGlassFall = 12, // #16
+        PolaritiesClocks = 13,
+        HourGlassSand = 14,
+        OrbElectricity = 15,
+        QuartzWatch = 16, // #24
+        ElfilisOrbClones = 17,
+        BuzzsawClockOrbs = 18,
+        CrystalCrackHoming = 19, // #20
+        OrbLaserRain = 20; // #23
 
     void DoAI()
     {
@@ -54,6 +67,19 @@ public partial class OracleBoss : ModNPC
             TeleportOrbWeb => DoTeleportOrbWeb(),
             SweepingProjectilesThatReverse => DoSweepingProjectilesThatReverse(),
             LaserRefraction => DoLaserRefraction(),
+            HourGlassOrbs => DoHourGlassOrbs(),
+            GiantClockLaser => DoGiantClockLaser(),
+            MagolorFields  => DoMagolorFields(),
+            SigilCannonballs => DoSigilCannonballs(),
+            HourGlassFall => DoHourGlassFall(),
+            PolaritiesClocks => DoPolaritiesClocks(),
+            HourGlassSand => DoHourGlassSand(),
+            OrbElectricity => DoOrbElectricity(),
+            QuartzWatch => DoQuartzWatch(),
+            ElfilisOrbClones => DoElfilisOrbClones(),
+            BuzzsawClockOrbs => DoBuzzsawClockOrbs(),
+            CrystalCrackHoming => DoCrystalCrackHoming(),
+            OrbLaserRain  => DoOrbLaserRain(),
             _ => AIState
         };
     }

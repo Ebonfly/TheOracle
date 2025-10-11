@@ -112,14 +112,14 @@ public class OracleJetBeam : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D tex = Assets.Extras.wavyLaser.Value;
-        Texture2D tex2 = Assets.Extras.Tentacle.Value;
+        Texture2D tex = Images.Extras.Textures.WavyLaser.Value;
+        Texture2D tex2 = Images.Extras.Textures.Tentacle.Value;
 
         float len = MathHelper.Lerp(300, 1200, Projectile.ai[0]);
 
         if ((int)Projectile.ai[2] == 1)
         {
-            tex = Assets.Extras.laser2.Value;
+            tex = Images.Extras.Textures.Laser.Value;
             len = 2700;
         }
 

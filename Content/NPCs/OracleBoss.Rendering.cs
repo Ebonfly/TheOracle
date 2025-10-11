@@ -17,11 +17,12 @@ public partial class OracleBoss : ModNPC
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
-        Texture2D underlayer = Assets.NPCs.OracleBoss_Underlayer.Value;
-        Texture2D underlayer2 = Assets.NPCs.OracleBoss_Underlayer2.Value;
+        if (NPC.IsABestiaryIconDummy) return false;
+        Texture2D underlayer = Images.NPCs.Textures.OracleBoss_Underlayer[0].Value;
+        Texture2D underlayer2 = Images.NPCs.Textures.OracleBoss_Underlayer[1].Value;
 
-        Texture2D crystalTex = Assets.NPCs.OracleCrystal.Value;
-        Texture2D orbTex = Assets.NPCs.OracleOrbs.Value;
+        Texture2D crystalTex = Images.NPCs.Textures.OracleCrystal.Value;
+        Texture2D orbTex = Images.NPCs.Textures.OracleOrbs.Value;
 
         spriteBatch.Draw(underlayer, NPC.Center - screenPos, null, drawColor, NPC.rotation, _mainOrigin, NPC.scale,
             SpriteEffects.None, 0);
@@ -60,12 +61,12 @@ public partial class OracleBoss : ModNPC
 
     void DrawSword(SpriteBatch spriteBatch, Vector2 screenPos)
     {
-        Texture2D sword = Assets.Extras.clockHandShort.Value;
-        Texture2D sword2 = Assets.Extras.clockHandLong.Value;
-        Texture2D flare = Assets.Extras.lensflare.Value;
-        Texture2D crosslight = Assets.Extras.crosslight.Value;
-        Texture2D clock = Assets.Extras.clock_premult.Value;
-        Texture2D glow = Assets.Extras.glow.Value;
+        Texture2D sword = Images.Extras.Textures.ClockHandShort.Value;
+        Texture2D sword2 = Images.Extras.Textures.ClockHandLong.Value;
+        Texture2D flare = Images.Extras.Textures.Lensflare.Value;
+        Texture2D crosslight = Images.Extras.Textures.Crosslight.Value;
+        Texture2D clock = Images.Extras.Textures.Clock.Value;
+        Texture2D glow = Images.Extras.Textures.Glow.Value;
 
         float scaleX = MathF.Pow(MathHelper.Clamp(AITimer3 * 0.5f, 0, 2), 2);
         float scale = MathF.Pow(MathHelper.Clamp(AITimer3 - 1f, 0, 2), 2);
@@ -184,9 +185,9 @@ public partial class OracleBoss : ModNPC
             if (vertices[i].Count > 2)
             {
                 PrimitiveUtils.DrawTexturedPrimitives(vertices[i].ToArray(), PrimitiveType.TriangleStrip,
-                    Assets.Extras.LintyTrail);
+                    Images.Extras.Textures.LintyTrail.Value);
                 PrimitiveUtils.DrawTexturedPrimitives(vertices[i].ToArray(), PrimitiveType.TriangleStrip,
-                    Assets.Extras.Tentacle);
+                    Images.Extras.Textures.Tentacle.Value);
             }
         }
 
@@ -196,13 +197,8 @@ public partial class OracleBoss : ModNPC
 
     void DrawJet(SpriteBatch spriteBatch, Vector2 screenPos)
     {
-        Asset<Texture2D>[] jetTex =
-        [
-            Assets.NPCs.Jet.OracleJet0, Assets.NPCs.Jet.OracleJet1,
-            Assets.NPCs.Jet.OracleJet2, Assets.NPCs.Jet.OracleJet3
-        ];
         int index = MathHelper.Clamp(NPC.frame.X / NPC.frame.Width, 0, 3);
-        Texture2D usedTex = jetTex[index].Value;
+        Texture2D usedTex = Images.NPCs.Jet.Textures.OracleJet[index].Value;
 
         Vector2 start = NPC.Center + new Vector2(0, 46).RotatedBy(NPC.rotation);
         Vector2 end = new Vector2(0, 49 + usedTex.Width).RotatedBy(NPC.oldRot[^1]);
@@ -244,7 +240,7 @@ public partial class OracleBoss : ModNPC
 
     void DrawEye(SpriteBatch spriteBatch, Vector2 screenPos)
     {
-        Texture2D eyeTex = Assets.NPCs.OracleEye.Value;
+        Texture2D eyeTex = Images.NPCs.Textures.OracleEye.Value;
         Rectangle eyeFrame = new Rectangle(0, NPC.frame.X / NPC.frame.Width * 20, 18, 20);
         if (Phase2)
             eyeFrame.Y = 4 * 18;
@@ -272,29 +268,41 @@ public partial class OracleBoss : ModNPC
 
     void DrawBody(SpriteBatch spriteBatch, Vector2 screenPos)
     {
-        Texture2D tex = Assets.NPCs.OracleBoss.Value;
-        Texture2D glow = Assets.NPCs.OracleBoss_Glow.Value;
-        Effect lightingEffect = TheOracle.FourPointGradient.Value;
+        Texture2D tex = Images.NPCs.Textures.OracleBoss.Value;
+        Texture2D glow = Images.NPCs.Textures.OracleBoss_Glow.Value;
 
         Vector4 LightingColor(Vector2 offset) =>
             new Vector4(Lighting.GetSubLight(NPC.Center + offset.RotatedBy(NPC.rotation)), 1) * 1.25f;
 
-        spriteBatch.End(out var ss);
-        spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointWrap, ss.depthStencilState,
-            ss.rasterizerState, lightingEffect, ss.matrix);
+        if (Effects.FourPointGradient.IsReady)
+        {
+            spriteBatch.End(out var ss);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointWrap,
+                ss.depthStencilState,
+                ss.rasterizerState, Effects.FourPointGradient.Value, ss.matrix);
 
-        lightingEffect.Parameters["colorTL"].SetValue(LightingColor(-_mainOrigin * 0.75f));
-        lightingEffect.Parameters["colorTR"]
-            .SetValue(LightingColor(new Vector2(_mainOrigin.X, -_mainOrigin.Y) * 0.75f));
-        lightingEffect.Parameters["colorBL"]
-            .SetValue(LightingColor(new Vector2(-_mainOrigin.X, _mainOrigin.Y) * 0.75f));
-        lightingEffect.Parameters["colorBR"].SetValue(LightingColor(_mainOrigin * 0.75f));
 
-        spriteBatch.Draw(tex, NPC.Center - screenPos, NPC.frame, Color.White, NPC.rotation, _mainOrigin, NPC.scale,
-            SpriteEffects.None, 0);
+            Effects.FourPointGradient.ColorTL = LightingColor(-_mainOrigin * 0.75f);
 
-        spriteBatch.End();
-        spriteBatch.Begin(ss);
+            Effects.FourPointGradient.ColorTR =
+                LightingColor(new Vector2(_mainOrigin.X, -_mainOrigin.Y) * 0.75f);
+
+            Effects.FourPointGradient.ColorBL =
+                LightingColor(new Vector2(-_mainOrigin.X, _mainOrigin.Y) * 0.75f);
+
+            Effects.FourPointGradient.ColorBR = LightingColor(_mainOrigin * 0.75f);
+
+            spriteBatch.Draw(tex, NPC.Center - screenPos, NPC.frame, Color.White, NPC.rotation, _mainOrigin, NPC.scale,
+                SpriteEffects.None, 0);
+
+            spriteBatch.End();
+            spriteBatch.Begin(ss);
+        }
+        else
+        {
+            spriteBatch.Draw(tex, NPC.Center - screenPos, NPC.frame, Color.White, NPC.rotation, _mainOrigin, NPC.scale,
+                SpriteEffects.None, 0);
+        }
 
         spriteBatch.Draw(glow, NPC.Center - screenPos, NPC.frame, Color.White, NPC.rotation, _mainOrigin, NPC.scale,
             SpriteEffects.None, 0);

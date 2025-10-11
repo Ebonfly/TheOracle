@@ -31,7 +31,9 @@ public class GlowDust : ModDust
 
     public override bool PreDraw(Dust dust)
     {
-        Texture2D tex = (dust.customData == null ? Assets.Extras.slash.Value : Assets.Extras.flare.Value);
+        Texture2D tex = (dust.customData == null
+            ? Images.Extras.Textures.Slash.Value
+            : Images.Extras.Textures.Flare.Value);
         Vector2 scale = new Vector2(MathHelper.Clamp(dust.velocity.Length(), 0, 5f), 5f);
         if (dust.customData != null)
             scale = Vector2.One * 5;

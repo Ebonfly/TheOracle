@@ -57,7 +57,8 @@ public class OracleBlastReversal : ModProjectile
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointWrap,
                 ss.depthStencilState, RasterizerState.CullNone, null, ss.matrix);
 
-            PrimitiveUtils.DrawTexturedPrimitives(vertices.ToArray(), PrimitiveType.TriangleStrip, Assets.Extras.Ex1,
+            PrimitiveUtils.DrawTexturedPrimitives(vertices.ToArray(), PrimitiveType.TriangleStrip,
+                Images.Extras.Textures.Ex.Value,
                 false);
 
             Main.spriteBatch.End();
