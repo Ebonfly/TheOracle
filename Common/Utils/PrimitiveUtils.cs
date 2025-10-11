@@ -75,6 +75,7 @@ public static class PrimitiveUtils
     public static void DrawPrimitives(VertexPositionColorTexture[] vertices, PrimitiveType type,
         bool drawBacksides = true)
     {
+        if (!Effects.TrailShader.IsReady) return;
         if (vertices.Length < 6) return;
         GraphicsDevice device = Main.graphics.GraphicsDevice;
         Effect effect = Effects.TrailShader.Value;
@@ -110,6 +111,7 @@ public static class PrimitiveUtils
     public static void DrawTexturedPrimitives(VertexPositionColorTexture[] vertices, PrimitiveType type,
         Texture2D texture, bool drawBacksides = false, bool actualColor = false, bool unscaled = false)
     {
+        if (!Effects.TrailShader.IsReady) return;
         GraphicsDevice device = Main.graphics.GraphicsDevice;
         Effect effect = Effects.TrailShader.Value;
         effect.Parameters["WorldViewProjection"].SetValue(unscaled ? GetMatrixUnscaled() : GetMatrix());

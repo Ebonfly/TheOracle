@@ -10,4 +10,5 @@ Projectiles: {
 	WebBeam.DisplayName: Web Beam
 	OracleBlastReversal.DisplayName: Oracle Blast Reversal
 	TimeReverseVFX.DisplayName: Time Reverse V F X
+	OrbClone.DisplayName: Orb Clone
 }

@@ -4,6 +4,7 @@ using Terraria;
 using Terraria.Graphics.CameraModifiers;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheOracle.Common.Utils;
 using TheOracle.Content.Dusts;
 using TheOracle.Content.Projectiles;
 using TheOracle.Content.Projectiles.VFX;
@@ -609,8 +610,77 @@ public partial class OracleBoss : ModNPC
             CrystalPosition = Vector2.Lerp(CrystalPosition, Player.Center - new Vector2(0, 300), 0.1f);
             for (int i = 0; i < 4; i++)
                 OrbPosition[i] = Vector2.Lerp(OrbPosition[i],
-                    Player.Center - new Vector2(0, 300) + new Vector2(100).RotatedBy(MathHelper.TwoPi * i / 4f +
-                        MathHelper.ToRadians(ConstantTimer * AITimer * 0.1f)), 0.1f);
+                    CrystalPosition + new Vector2(100).RotatedBy(ConstantTimer * 0.01f + MathHelper.TwoPi * i / 4f),
+                    0.1f);
+        }
+
+        else
+        {
+            AITimer2 = MathHelper.Lerp(AITimer2, 0.25f, 0.1f);
+            if (AITimer > 180 && AITimer3 < MathHelper.Pi)
+                AITimer3 += MathHelper.Pi / 150f;
+            CrystalRotation = AITimer3;
+
+            Vector2[] pos =
+            [
+                new(20, 0),
+                new(150, 200),
+                new(0, 250),
+                new(-150, 200),
+                new(-20, 0),
+                new(-150, -200),
+                new(0, -250),
+                new(150, -200),
+                new(20, 0)
+            ];
+
+            for (int j = 0; j < pos.Length; j++)
+            {
+                pos[j] = CrystalPosition + pos[j].RotatedBy(AITimer3);
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                float t = (i / 4f + ConstantTimer * 0.01f) % 1f;
+
+                OrbPosition[i] = Vector2.Lerp(OrbPosition[i], OrbPosition[i].MultiLerp(t, pos), AITimer2);
+
+                if (ConstantTimer % 4 == i)
+                    Projectile.NewProjectile(null, OrbPosition[i], Vector2.Zero, ModContent.ProjectileType<OrbClone>(),
+                        0, 0);
+            }
+
+            if ((AITimer is > 70 and < 180 || (AITimer > 180 && AITimer3 < MathHelper.Pi)) & ConstantTimer % 10 == 0)
+            {
+                if (AITimer > 80)
+                    for (int i = 0; i < 6; i++)
+                    {
+                        int index = i + (i > 2 ? 2 : 1);
+
+                        int dir = index switch
+                        {
+                            1 => -1,
+                            3 => 1,
+                            5 => -1,
+                            7 => 1,
+                            _ => 0
+                        };
+                        Projectile.NewProjectile(null,
+                            pos[index] - (CrystalPosition - pos[index]).SafeNormalize(Vector2.UnitY) * 20,
+                            (CrystalPosition - pos[index]).SafeNormalize(Vector2.UnitY),
+                            ModContent.ProjectileType<OracleJetBeam>(), 15, 0, ai1: dir * MathHelper.PiOver4,
+                            ai2: 2);
+                    }
+            }
+
+            if ((int)AITimer == 405)
+            {
+                for (int j = -4; j < 5; j++)
+                for (int i = -1; i < 2; i += 2)
+                    Projectile.NewProjectile(null, CrystalPosition - new Vector2(0, 20 * i),
+                        Vector2.UnitY.RotatedBy(j * 0.24f) * i,
+                        ModContent.ProjectileType<OracleJetBeam>(), 25, 0, ai2: 1);
+            }
         }
 
         return HourGlassOrbs;

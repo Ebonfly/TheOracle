@@ -34,9 +34,33 @@ public class OracleJetBeam : ModProjectile
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         float a = 0;
+
+        if ((int)Projectile.ai[2] == 2)
+        {
+            Vector2 start = Projectile.Center;
+            Vector2 end = Projectile.Center + Projectile.velocity * 2700;
+
+            Vector2 halfway = Vector2.Lerp(start, end, 0.5f) +
+                              Projectile.velocity.RotatedBy(Projectile.ai[1]) * (800 + 300 * Projectile.scale);
+
+            for (float i = 0.05f; i < 1; i += 0.05f)
+            {
+                Vector2 oldPos = Vector2.Lerp(Vector2.Lerp(start, halfway, (i - 0.05f) * 2),
+                    Vector2.Lerp(halfway, end, (i - 0.05f) * 2),
+                    (i - 0.05f));
+                Vector2 pos = Vector2.Lerp(Vector2.Lerp(start, halfway, i * 2), Vector2.Lerp(halfway, end, i * 2), i);
+
+                if (Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), oldPos, pos, 20,
+                        ref a))
+                    return true;
+            }
+
+            return false;
+        }
+
         return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center,
             Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.UnitX) *
-            ((int)Projectile.ai[2] == 1 ? 2700 : 1200), 40, ref a);
+            (Projectile.ai[2] is >= 1 and <= 2 ? 2700 : 1200), Projectile.ai[1] < 1 ? 40 : 20, ref a);
     }
 
     public override bool ShouldUpdatePosition() => false;
@@ -45,7 +69,8 @@ public class OracleJetBeam : ModProjectile
 
     public override void AI()
     {
-        if ((int)Projectile.ai[2] == 1)
+        Projectile.damage = 100;
+        if (Projectile.ai[2] is >= 1 and <= 2)
         {
             if (Projectile.timeLeft >= 45)
             {
@@ -53,7 +78,7 @@ public class OracleJetBeam : ModProjectile
                 Projectile.ai[0] = MathHelper.Lerp(Projectile.ai[0], 0.2f, 0.1f);
             }
 
-            if (Projectile.timeLeft == 50)
+            if (Projectile.timeLeft == 50 && (int)Projectile.ai[2] != 2)
                 Projectile.NewProjectile(null, Projectile.Center, Vector2.Zero, ModContent.ProjectileType<Flare>(),
                     0,
                     0);
@@ -64,25 +89,28 @@ public class OracleJetBeam : ModProjectile
                 Projectile.ai[0] = 1;
                 Projectile.localAI[0] = 0;
                 Projectile.timeLeft = 40;
-                if (!Main.dedServ)
-                    Main.instance.CameraModifiers.Add(new PunchCameraModifier(Projectile.Center,
-                        Projectile.velocity,
-                        3f, 20, 15));
-
-                for (int j = 0; j < 5; j++)
+                if ((int)Projectile.ai[2] != 2)
                 {
-                    Vector2 vel = Projectile.velocity.RotatedByRandom(1.5f);
-                    Dust.NewDustPerfect(Projectile.Center + vel.RotatedByRandom(0.1f) * 32,
-                        ModContent.DustType<GlowDust>(),
-                        vel * Main.rand.NextFloat(5, 8), 0,
-                        Color.CornflowerBlue with { A = 0 });
+                    if (!Main.dedServ)
+                        Main.instance.CameraModifiers.Add(new PunchCameraModifier(Projectile.Center,
+                            Projectile.velocity,
+                            3f, 20, 15));
+
+                    for (int j = 0; j < 5; j++)
+                    {
+                        Vector2 vel = Projectile.velocity.RotatedByRandom(1.5f);
+                        Dust.NewDustPerfect(Projectile.Center + vel.RotatedByRandom(0.1f) * 32,
+                            ModContent.DustType<GlowDust>(),
+                            vel * Main.rand.NextFloat(5, 8), 0,
+                            Color.CornflowerBlue with { A = 0 });
+                    }
                 }
 
                 return;
             }
         }
 
-        if ((int)Projectile.ai[2] == 1)
+        if (Projectile.ai[2] is >= 1 and <= 2)
             Projectile.ai[0] = MathHelper.Lerp(Projectile.ai[0], 0, 0.1f);
 
         Projectile.rotation = Projectile.velocity.ToRotation();
@@ -93,7 +121,7 @@ public class OracleJetBeam : ModProjectile
             Projectile.ai[0] = MathHelper.Lerp(Projectile.ai[0], 1, 0.1f);
         }
 
-        if ((int)Projectile.ai[2] == 1)
+        if (Projectile.ai[2] is >= 1 and <= 2)
         {
             if (Projectile.timeLeft < 15)
                 Projectile.localAI[0] = MathHelper.Lerp(Projectile.localAI[0], 1, 0.15f);
@@ -117,7 +145,7 @@ public class OracleJetBeam : ModProjectile
 
         float len = MathHelper.Lerp(300, 1200, Projectile.ai[0]);
 
-        if ((int)Projectile.ai[2] == 1)
+        if (Projectile.ai[2] is >= 1 and <= 2)
         {
             tex = Images.Extras.Textures.Laser.Value;
             len = 2700;
@@ -127,16 +155,29 @@ public class OracleJetBeam : ModProjectile
         Vector2 start = Projectile.Center - Main.screenPosition;
         Vector2 end = Projectile.Center + Projectile.velocity
             * len * Projectile.scale - Main.screenPosition;
+
+        if ((int)Projectile.ai[2] == 2)
+            end = Projectile.Center + Projectile.velocity
+                * len - Main.screenPosition;
+
+        Vector2 halfway = Vector2.Lerp(start, end, 0.5f) +
+                          Projectile.velocity.RotatedBy(Projectile.ai[1]) * (800 + 300 * Projectile.scale);
+
         for (float i = 0; i < 1f; i += 0.05f)
         {
+            Vector2 pos = Vector2.Lerp(start, end, i);
+
+            if ((int)Projectile.ai[2] == 2)
+                pos = Vector2.Lerp(Vector2.Lerp(start, halfway, i * 2), Vector2.Lerp(halfway, end, i * 2), i);
+
             Color color = Color.Lerp(Color.CornflowerBlue, Color.Transparent, MathHelper.SmoothStep(0, 1, i)) *
                           MathHelper.Clamp(i * 4, 0, 1) * 2 * (1 - Projectile.localAI[0]);
-            vertices.Add(PrimitiveUtils.AsVertex(Vector2.Lerp(start, end, i) +
+            vertices.Add(PrimitiveUtils.AsVertex(pos +
                                                  new Vector2((i + 0.5f) * 20 + Projectile.ai[0] * 20, 0).RotatedBy(
                                                      Projectile.rotation + MathHelper.PiOver2),
                 color, new Vector2(-2 * i * Projectile.ai[0] + Main.GlobalTimeWrappedHourly * 3, 0)));
 
-            vertices.Add(PrimitiveUtils.AsVertex(Vector2.Lerp(start, end, i) +
+            vertices.Add(PrimitiveUtils.AsVertex(pos +
                                                  new Vector2((i + 0.5f) * 20 + Projectile.ai[0] * 20, 0).RotatedBy(
                                                      Projectile.rotation - MathHelper.PiOver2),
                 color, new Vector2(-2 * i * Projectile.ai[0] + Main.GlobalTimeWrappedHourly * 3, 1)));
