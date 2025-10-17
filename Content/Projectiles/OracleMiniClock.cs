@@ -42,12 +42,12 @@ public class OracleMiniClock : ModProjectile
         if (Projectile.ai[0] > 420)
         {
             Projectile.ai[1] = MathHelper.Lerp(Projectile.ai[1], 0, 0.05f);
-            Projectile.ai[2] = MathHelper.Lerp(Projectile.ai[2], 1, 0.05f);
+            alpha = MathHelper.Lerp(alpha, 1, 0.05f);
         }
         else if (Projectile.ai[0] > 50)
             Projectile.ai[1] = MathHelper.Lerp(Projectile.ai[1], 1, 0.05f);
 
-        if ((int)Projectile.ai[0] == 375)
+        if ((int)Projectile.ai[0] == 375 && Projectile.ai[2] < 1)
         {
             if (Main.netMode != 1)
                 for (int i = 0; i < 12; i++)
@@ -67,7 +67,7 @@ public class OracleMiniClock : ModProjectile
             SoundEngine.PlaySound(new SoundStyle("TheOracle/Assets/Sounds/clockBell").WithVolumeScale(3));
         }
 
-        if (Projectile.ai[0] > 340 && Projectile.ai[0] < 360)
+        if (Projectile.ai[0] > 340 && Projectile.ai[0] < 360 && Projectile.ai[2] < 1)
         {
             Vector2 pos = Projectile.Center + Main.rand.NextVector2Unit() * Main.rand.NextFloat(250, 500);
             for (int i = 0; i < 3; i++)
@@ -84,7 +84,8 @@ public class OracleMiniClock : ModProjectile
 
         if ((int)(Projectile.ai[0] - 50) % 30 < 2 && Projectile.ai[0] > 52 && Projectile.ai[0] < 440)
         {
-            if (Main.netMode != 1 && Projectile.ai[0] < 410 && (int)(Projectile.ai[0] - 50) % 30 == 1)
+            if (Main.netMode != 1 && Projectile.ai[0] < 410 && (int)(Projectile.ai[0] - 50) % 30 == 1 &&
+                Projectile.ai[2] < 1)
             {
                 for (int i = -1; i < 2; i += 2)
                 for (int j = -1; j < 2; j++)
@@ -100,6 +101,8 @@ public class OracleMiniClock : ModProjectile
         }
     }
 
+    private float alpha;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D glow = Images.Extras.Textures.Glow.Value;
@@ -113,7 +116,7 @@ public class OracleMiniClock : ModProjectile
         for (int i = 0; i < 2; i++)
         {
             Color col = (i == 0 ? Color.CornflowerBlue : Color.White * 0.5f) * (Projectile.scale / 0.3f) *
-                        (1 - Projectile.ai[2]);
+                        (1 - alpha);
 
             Main.spriteBatch.Draw(clock, Projectile.Center - Main.screenPosition, null,
                 col with { A = 0 } * Projectile.ai[1] * 0.1f, 0, clock.Size() / 2, .18f, SpriteEffects.None, 0);
