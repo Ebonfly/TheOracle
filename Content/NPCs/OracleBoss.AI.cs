@@ -20,8 +20,9 @@ public partial class OracleBoss : ModNPC
 
         if (Main.mouseRight)
         {
+            AttackPart = 0;
             NPC.velocity = (Main.MouseWorld - NPC.Center) * 0.05f;
-            AIState = HourGlassOrbs;
+            AIState = CrystalSliceDash;
             EyeTarget = Player.Center;
             AITimer = -50;
             AITimer2 = 0;

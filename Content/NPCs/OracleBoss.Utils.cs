@@ -13,6 +13,7 @@ public partial class OracleBoss : ModNPC
 
     int ResetTo(int move, int idleTime = 200)
     {
+        AttackPart = 0;
         AITimer = -idleTime;
         AITimer2 = 0;
         AITimer3 = 0;
@@ -21,6 +22,23 @@ public partial class OracleBoss : ModNPC
         DisposablePosition = Vector2.Zero;
         NPC.netUpdate = true;
         return move;
+    }
+
+    void IncrementAttackPart(bool leaveTimer2 = false, bool leaveTimer3 = false, bool leaveLocals = false,
+        bool leaveDisposable = false)
+    {
+        AttackPart++;
+        AITimer = 0;
+        if (!leaveTimer2)
+            AITimer2 = 0;
+        if (!leaveTimer3)
+            AITimer3 = 0;
+        if (!leaveLocals)
+            for (int i = 0; i < NPC.localAI.Length; i++)
+                NPC.localAI[0] = 0;
+        if (!leaveDisposable)
+            DisposablePosition = Vector2.Zero;
+        NPC.netUpdate = true;
     }
 
     public void TargetingLogic(int take = 0)

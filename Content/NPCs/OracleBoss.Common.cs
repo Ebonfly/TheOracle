@@ -26,6 +26,7 @@ public partial class OracleBoss : ModNPC
     public Vector2[,] OldOrbPosition = new Vector2[OrbAmount, 5];
     public float IdleSpeed = 1f;
     public int ConstantTimer;
+    public int AttackPart;
     public ref float AIState => ref NPC.ai[0];
     public ref float AITimer => ref NPC.ai[1];
     public ref float AITimer2 => ref NPC.ai[2];
@@ -69,7 +70,7 @@ public partial class OracleBoss : ModNPC
             LaserRefraction => DoLaserRefraction(),
             HourGlassOrbs => DoHourGlassOrbs(),
             GiantClockLaser => DoGiantClockLaser(),
-            MagolorFields  => DoMagolorFields(),
+            MagolorFields => DoMagolorFields(),
             SigilCannonballs => DoSigilCannonballs(),
             HourGlassFall => DoHourGlassFall(),
             PolaritiesClocks => DoPolaritiesClocks(),
@@ -79,7 +80,7 @@ public partial class OracleBoss : ModNPC
             ElfilisOrbClones => DoElfilisOrbClones(),
             BuzzsawClockOrbs => DoBuzzsawClockOrbs(),
             CrystalCrackHoming => DoCrystalCrackHoming(),
-            OrbLaserRain  => DoOrbLaserRain(),
+            OrbLaserRain => DoOrbLaserRain(),
             _ => AIState
         };
     }

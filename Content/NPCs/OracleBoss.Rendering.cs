@@ -55,7 +55,6 @@ public partial class OracleBoss : ModNPC
 
         if ((int)AIState is OrbClockHandSwordForm)
             DrawSword(spriteBatch, screenPos);
-
         return false;
     }
 
