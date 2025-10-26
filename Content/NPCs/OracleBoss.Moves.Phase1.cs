@@ -68,6 +68,7 @@ public partial class OracleBoss : ModNPC
 
         switch (AttackPart)
         {
+            // Startup
             case 0:
                 IdleCrystal();
                 if (AITimer < 2)
@@ -81,6 +82,8 @@ public partial class OracleBoss : ModNPC
                 if (AITimer >= 40)
                     IncrementAttackPart();
                 break;
+
+            // Chargeup
             case 1:
                 if (AITimer < 40)
                 {
@@ -103,6 +106,8 @@ public partial class OracleBoss : ModNPC
                 }
 
                 break;
+
+            // 1st slice
             case 2:
                 if (AITimer < 10)
                     CrystalRotation =
@@ -119,6 +124,8 @@ public partial class OracleBoss : ModNPC
                 if (AITimer >= 60)
                     IncrementAttackPart();
                 break;
+
+            // Rest of the slices
             case 3:
                 if (AITimer < 10)
                 {
@@ -167,7 +174,7 @@ public partial class OracleBoss : ModNPC
         IdleCrystal();
         for (int i = 1; i < 4; i++)
         {
-            if (AITimer is > 10 and < 682 && (int)AITimer % 3 == i - 1)
+            if (AttackPart == 0 ? AITimer > 10 : AttackPart < 7 && (int)AITimer % 3 == i - 1)
             {
                 bool inner = Main.rand.NextBool(5);
                 Dust d = Dust.NewDustPerfect(OrbPosition[0], ModContent.DustType<GlowDust>(),
@@ -176,97 +183,117 @@ public partial class OracleBoss : ModNPC
                     newColor: Color.CornflowerBlue with { A = 0 }, Scale: 0.9f);
                 d.noGravity = true;
                 if (inner)
-                    d.customData = inner;
+                    d.customData = true;
             }
 
             OrbPosition[i] = Vector2.Lerp(OrbPosition[i],
                 OrbPosition[0] + new Vector2(120).RotatedBy(MathHelper.TwoPi * i / 3f + ConstantTimer * 0.1f),
-                MathHelper.Clamp(AITimer / 60f, 0, 1));
+                AttackPart == 0 ? MathHelper.Clamp(AITimer / 60f, 0, 1) : 1);
         }
 
-        if ((int)AITimer % 5 == 0 && !Main.dedServ && AITimer < 90)
-            Main.instance.CameraModifiers.Add(new PunchCameraModifier(OrbPosition[0], Main.rand.NextVector2Unit(),
-                AITimer / 10f + 2, 20, 5, 1000));
-
-        if ((int)AITimer == 94 && !Main.dedServ)
+        if (AttackPart > 0)
         {
+            NPC.velocity = Vector2.Lerp(NPC.velocity, (Player.Center - new Vector2(0, 240) - NPC.Center) * 0.05f,
+                0.04f * (AttackPart == 1 ? MathHelper.Clamp(AITimer / 20f, 0, 1) : 1));
+        }
+
+        void Slice()
+        {
+            NPC.localAI[2] = 3f;
+            Projectile.NewProjectile(null, OrbPosition[0],
+                (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX),
+                ModContent.ProjectileType<CrystalSlice>(), 25, 0, ai2: 1);
+
             Main.instance.CameraModifiers.Add(new PunchCameraModifier(OrbPosition[0],
                 (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX),
                 30, 20, 20, 3000));
 
             SoundEngine.PlaySound(
-                new SoundStyle("TheOracle/Assets/Sounds/clockMagicBurst") with { Volume = 2, PitchVariance = 0.1f });
+                new SoundStyle("TheOracle/Assets/Sounds/sliceMagic") with { Volume = 2, PitchVariance = 0.1f });
         }
 
-        if (AITimer < 60)
+        switch (AttackPart)
         {
-            NPC.localAI[2] = 0.2f;
-            OrbPosition[0] = Vector2.Lerp(OrbPosition[0], NPC.Center + new Vector2(0, 300), 0.2f);
-            NPC.velocity = Vector2.Lerp(NPC.velocity, -Vector2.UnitY * 3, 0.1f);
-        }
-        else if (AITimer < 90)
-            AITimer3 = MathHelper.Lerp(AITimer3, 1.8f, 0.05f);
-        else if (AITimer < 94)
-            AITimer3 = MathHelper.Lerp(AITimer3, 2.3f, 0.3f);
-        else if (AITimer < 500)
-            AITimer3 = MathHelper.Lerp(AITimer3, 2f, 0.2f);
+            // Charge up the spear
+            case 0:
+                NPC.localAI[2] = 0.2f;
+                OrbPosition[0] = Vector2.Lerp(OrbPosition[0], NPC.Center + new Vector2(0, 300), 0.2f);
+                NPC.velocity = Vector2.Lerp(NPC.velocity, -Vector2.UnitY * 3, 0.1f);
 
-        if (AITimer > 60)
-        {
-            if (AITimer < 112)
-                NPC.localAI[1] = MathHelper.Clamp((AITimer - 60f) / 50f, 0, 1);
+                if ((int)AITimer % 5 == 0 && !Main.dedServ)
+                    Main.instance.CameraModifiers.Add(new PunchCameraModifier(OrbPosition[0],
+                        Main.rand.NextVector2Unit(), AITimer / 7f + 2, 20, 5, 1000));
 
-            NPC.velocity = Vector2.Lerp(NPC.velocity, (Player.Center - new Vector2(0, 240) - NPC.Center) * 0.05f,
-                0.04f * MathHelper.Clamp((AITimer - 60) / 20f, 0, 1));
+                if (AITimer > 60)
+                    IncrementAttackPart(leaveLocals: true);
+                break;
 
-            if (AITimer is > 90 and < 120)
-                OrbPosition[0] += Main.rand.NextVector2Circular(15, 15);
-            if (AITimer is > 120 and < 240)
-            {
-                NPC.localAI[1] = 0;
+            // Ominous hover
+            case 1:
+                EyeTarget = Vector2.Lerp(EyeTarget, Player.Center +
+                                                    (Player.Center - OrbPosition[0]).SafeNormalize(Vector2.UnitX) *
+                                                    2000, AITimer / 120f);
+                if (AITimer < 30)
+                    AITimer3 = MathHelper.Lerp(AITimer3, 1.8f, 0.05f);
+                else if (AITimer < 34)
+                    AITimer3 = MathHelper.Lerp(AITimer3, 2.3f, 0.3f);
 
-                OrbPosition[0] = Vector2.Lerp(OrbPosition[0],
-                    Player.Center + (OrbPosition[0] - Player.Center).SafeNormalize(Vector2.UnitX)
-                    .RotatedBy(MathF.Sin(ConstantTimer * 0.06f) * 0.05f) *
-                    (700 + MathF.Sin(ConstantTimer * 0.06f) * 100), 0.1f);
-            }
-
-            if (AITimer > 240)
-            {
-                if ((int)AITimer is 270 or 600)
+                if ((int)AITimer == 34 && !Main.dedServ)
                 {
-                    NPC.localAI[2] = 3f;
-                    Projectile.NewProjectile(null, OrbPosition[0],
-                        (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX),
-                        ModContent.ProjectileType<CrystalSlice>(), 25, 0, ai2: 1);
-
                     Main.instance.CameraModifiers.Add(new PunchCameraModifier(OrbPosition[0],
                         (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX),
                         30, 20, 20, 3000));
 
                     SoundEngine.PlaySound(
-                        new SoundStyle("TheOracle/Assets/Sounds/sliceMagic") with { Volume = 2, PitchVariance = 0.1f });
+                        new SoundStyle("TheOracle/Assets/Sounds/clockMagicBurst") with
+                        {
+                            Volume = 2, PitchVariance = 0.1f
+                        });
                 }
+
+                if (AITimer < 52)
+                    NPC.localAI[1] = MathHelper.Clamp(AITimer / 50f, 0, 1);
+
+                if (AITimer is > 30 and < 60)
+                    OrbPosition[0] += Main.rand.NextVector2Circular(15, 15);
+                if (AITimer is > 60 and < 120)
+                {
+                    NPC.localAI[1] = 0;
+
+                    OrbPosition[0] = Vector2.Lerp(OrbPosition[0],
+                        Player.Center + (OrbPosition[0] - Player.Center).SafeNormalize(Vector2.UnitX)
+                        .RotatedBy(MathF.Sin(ConstantTimer * 0.06f) * 0.05f) *
+                        (700 + MathF.Sin(ConstantTimer * 0.06f) * 100), 0.1f);
+                }
+
+                if (AITimer >= 120)
+                    IncrementAttackPart(leaveTimer3: true, leaveLocals: true);
+                break;
+
+            // Impale move #1
+            case 2:
+                if ((int)AITimer == 30)
+                    Slice();
 
                 NPC.localAI[2] = MathHelper.Lerp(NPC.localAI[2], 0.2f, 0.05f);
 
-                if (AITimer < 270)
+                if (AITimer < 30)
                 {
-                    if (AITimer < 255)
+                    if (AITimer < 15)
                         AITimer2 = .5f;
                     EyeTarget = Player.Center +
                                 (Player.Center - OrbPosition[0]).SafeNormalize(Vector2.UnitX) * 2000;
                     OrbPosition[0] += (OrbPosition[0] - Player.Center).SafeNormalize(Vector2.UnitX) * 15 *
-                                      MathF.Sin((AITimer - 240) / 30f * MathF.PI);
+                                      MathF.Sin(AITimer / 30f * MathF.PI);
                 }
-                else if (AITimer < 290)
+                else if (AITimer < 50)
                 {
                     NPC.localAI[1] = MathHelper.Lerp(NPC.localAI[1], 1, 0.1f);
                     OrbPosition[0] += (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX) * 120;
                 }
-                else if (AITimer < 300)
+                else if (AITimer < 60)
                     EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.05f);
-                else if (AITimer < 340)
+                else if (AITimer < 100)
                 {
                     NPC.localAI[1] = 0;
 
@@ -279,54 +306,67 @@ public partial class OracleBoss : ModNPC
 
                     NPC.localAI[0] = (OrbPosition[0] - Player.Center).ToRotation();
                 }
-                else if (AITimer < 360)
+                else
+                    IncrementAttackPart(leaveTimer2: true, leaveTimer3: true, leaveLocals: true);
+
+                break;
+
+            // Small jab #1
+            case 3:
+                if (AITimer < 20)
                 {
                     AITimer2 = 0.5f;
-                    NPC.localAI[1] = (AITimer - 340) / 20f;
+                    NPC.localAI[1] = AITimer / 20f;
                     OrbPosition[0] += (OrbPosition[0] - Player.Center).SafeNormalize(Vector2.UnitX) * 12.5f *
-                                      MathF.Sin((AITimer - 340) / 20f * MathF.PI);
+                                      MathF.Sin(AITimer / 20f * MathF.PI);
 
-                    if ((int)AITimer == 359)
+                    if ((int)AITimer == 19)
                         SoundEngine.PlaySound(
                             new SoundStyle("TheOracle/Assets/Sounds/quickConjure") with
                             {
                                 Volume = 2, PitchVariance = 0.1f
                             });
                 }
-                else if (AITimer < 370)
+                else if (AITimer < 30)
                 {
                     NPC.localAI[1] = 0;
-                    if (AITimer < 366)
+                    if (AITimer < 26)
                         OrbPosition[0] += (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX)
-                            .RotatedBy(MathF.Sin((AITimer - 350) / 30f) * 0.03f) * 80;
+                            .RotatedBy(MathF.Sin((AITimer - 20) / 10f) * 0.03f) * 80;
                 }
-                else if (AITimer < 420)
+                else
+                    IncrementAttackPart(leaveTimer2: true, leaveTimer3: true, leaveLocals: true);
+
+                break;
+
+            // Small jab #2
+            case 4:
+                if (AITimer < 50)
                 {
-                    if (AITimer > 380)
+                    if (AITimer > 10)
                         AITimer2 = 0.5f;
                     OrbPosition[0] = Vector2.Lerp(OrbPosition[0],
                         Player.Center +
-                        new Vector2(700 + ((AITimer - 370) / 50f) * 100 + MathF.Sin(ConstantTimer * 0.06f) * 100, 0)
-                            .RotatedBy(
-                                NPC.localAI[0] + MathF.Sin(ConstantTimer * 0.06f)), 0.1f);
+                        new Vector2(700 + (AITimer / 50f) * 100 + MathF.Sin(ConstantTimer * 0.06f) * 100, 0)
+                            .RotatedBy(NPC.localAI[0] + MathF.Sin(ConstantTimer * 0.06f)), 0.1f);
 
                     EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.1f);
 
-                    if ((int)AITimer == 419)
+                    if ((int)AITimer == 49)
                         SoundEngine.PlaySound(
                             new SoundStyle("TheOracle/Assets/Sounds/quickConjure") with
                             {
                                 Volume = 2, PitchVariance = 0.1f
                             });
                 }
-                else if (AITimer < 430)
+                else if (AITimer < 60)
                 {
-                    NPC.localAI[1] = (AITimer - 420) / 10f;
+                    NPC.localAI[1] = (AITimer - 50) / 10f;
                     if (AITimer < 426)
                         OrbPosition[0] += (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX)
-                            .RotatedBy(MathF.Sin((AITimer - 400) / 30f) * 0.03f) * 70;
+                            .RotatedBy(MathF.Sin((AITimer - 10) / 10f) * 0.03f) * 70;
                 }
-                else if (AITimer < 480)
+                else if (AITimer < 110)
                 {
                     NPC.localAI[1] = 0;
 
@@ -334,13 +374,19 @@ public partial class OracleBoss : ModNPC
                         Player.Center + (OrbPosition[0] - Player.Center).SafeNormalize(Vector2.UnitX)
                         .RotatedBy(MathF.Sin(ConstantTimer * 0.06f) * 0.05f) *
                         (700 + MathF.Sin(ConstantTimer * 0.06f) * 100), 0.1f);
-                    if (AITimer < 510)
-                        EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.1f);
+                    EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.1f);
                     DisposablePosition = OrbPosition[0];
                 }
-                else if (AITimer < 530)
+                else
+                    IncrementAttackPart(leaveTimer2: true, leaveTimer3: true, leaveLocals: true, leaveDisposable: true);
+
+                break;
+
+            // Swing
+            case 5:
+                if (AITimer < 50)
                 {
-                    float x = (AITimer - 480) / 50f;
+                    float x = AITimer / 50f;
                     float progress = MathF.Pow(x, 2);
 
                     float defRot = (Player.Center - OrbPosition[0]).ToRotation();
@@ -349,39 +395,22 @@ public partial class OracleBoss : ModNPC
 
                     EyeTarget = Vector2.Lerp(EyeTarget, DisposablePosition + rotation.ToRotationVector2() * 1000, 0.2f);
 
-                    if ((int)AITimer % 3 == 0 && AITimer > 500)
+                    if ((int)AITimer % 3 == 0 && AITimer > 20)
                         Projectile.NewProjectile(null, OrbPosition[0] + rotation.ToRotationVector2() * 300,
                             (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX),
                             ModContent.ProjectileType<CrystalSlice>(), 25, 0);
                 }
-                else if (AITimer < 600)
-                {
-                    NPC.localAI[1] = 0;
-                    AITimer2 = MathF.Pow((AITimer - 530) / 70f, 2);
+                else
+                    IncrementAttackPart(leaveTimer2: true, leaveTimer3: true, leaveLocals: true);
 
-                    OrbPosition[0] = Vector2.Lerp(OrbPosition[0],
-                                         Player.Center + (OrbPosition[0] - Player.Center).SafeNormalize(Vector2.UnitX)
-                                         .RotatedBy(MathF.Sin(ConstantTimer * 0.06f) * 0.05f) *
-                                         (700 + MathF.Sin(ConstantTimer * 0.06f) * 100 + AITimer2 * 400), 0.1f) +
-                                     Main.rand.NextVector2Unit() * AITimer2 * 25;
-                    if (AITimer < 590)
-                        EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.1f);
-                    else
-                        EyeTarget = Player.Center +
-                                    (Player.Center - OrbPosition[0]).SafeNormalize(Vector2.UnitX) * 1000;
-                }
-                else if (AITimer < 620)
-                {
-                    OrbPosition[0] += (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX) *
-                                      MathHelper.Lerp(100, 150, (AITimer - 520) / 20f);
-                    NPC.localAI[1] = 2 + MathHelper.Clamp((AITimer - 640) / 15f, 0, 1);
-                }
-                else if (AITimer < 642)
-                {
-                    AITimer3 = MathHelper.SmoothStep(2, 0, (AITimer - 620) / 20f);
-                }
+                break;
 
-                if ((int)AITimer == 620)
+            // Impale move #2
+            case 6:
+                if ((int)AITimer == 70)
+                    Slice();
+
+                if ((int)AITimer == 90)
                 {
                     for (int i = 0; i < 25; i++)
                         Projectile.NewProjectile(null, EyeTarget,
@@ -389,18 +418,50 @@ public partial class OracleBoss : ModNPC
                             ModContent.ProjectileType<CrystalSlice>(), 25, 0, ai2: 3);
                 }
 
-                if ((int)AITimer == 630)
+                if ((int)AITimer == 100)
                     SoundEngine.PlaySound(
                         new SoundStyle("TheOracle/Assets/Sounds/bigExplosion") with
                         {
                             Volume = 2, PitchVariance = 0.1f, Pitch = .5f
                         });
-            }
-            else
-            {
+
+                if (AITimer < 70)
+                {
+                    NPC.localAI[1] = 0;
+                    AITimer2 = MathF.Pow(AITimer / 70f, 2);
+
+                    OrbPosition[0] = Vector2.Lerp(OrbPosition[0],
+                                         Player.Center + (OrbPosition[0] - Player.Center).SafeNormalize(Vector2.UnitX)
+                                         .RotatedBy(MathF.Sin(ConstantTimer * 0.06f) * 0.05f) *
+                                         (700 + MathF.Sin(ConstantTimer * 0.06f) * 100 + AITimer2 * 400), 0.1f) +
+                                     Main.rand.NextVector2Unit() * AITimer2 * 25;
+                    if (AITimer < 60)
+                        EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.1f);
+                    else
+                        EyeTarget = Player.Center +
+                                    (Player.Center - OrbPosition[0]).SafeNormalize(Vector2.UnitX) * 1000;
+                }
+                else if (AITimer < 90)
+                {
+                    OrbPosition[0] += (EyeTarget - OrbPosition[0]).SafeNormalize(Vector2.UnitX) *
+                                      MathHelper.Lerp(100, 150, (AITimer - 70f) / 20f);
+                    NPC.localAI[1] = 2 + MathHelper.Clamp((AITimer - 70) / 15f, 0, 1);
+                }
+                else if (AITimer < 112)
+                {
+                    AITimer3 = MathHelper.SmoothStep(2, 0, (AITimer - 90) / 20f);
+                }
+                else
+                    IncrementAttackPart(leaveTimer2: true, leaveTimer3: true, leaveLocals: true);
+
+                break;
+            case 7:
                 EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.1f);
-            }
+                break;
         }
+
+        if (AttackPart is >= 1 and < 7 && (AttackPart == 1 ? AITimer > 90 : true))
+            AITimer3 = MathHelper.Lerp(AITimer3, 2f, 0.2f);
 
         AITimer2 = MathHelper.Lerp(AITimer2, 0, 0.1f);
         return OrbClockHandSwordForm;
@@ -410,69 +471,80 @@ public partial class OracleBoss : ModNPC
     {
         IdleCrystal();
 
-        for (int i = 0; i < 4; i++)
+        switch (AttackPart)
         {
-            float fac = MathF.Sin(ConstantTimer * 0.05f + (MathHelper.TwoPi * i / 4f));
-            Vector2 pos = NPC.Center - new Vector2(0, 300) +
-                          new Vector2((i - 1.5f) * 100, 40 + fac * 20);
-            OrbPosition[i] = Vector2.Lerp(OrbPosition[i], pos, 0.1f);
-
-            if (AITimer > 20 && (int)AITimer % 5 == 0 && Main.netMode != 1)
-            {
-                if (AITimer >= 60 && AITimer < 170)
+            // Telegraph
+            case 0:
+                for (int i = 0; i < 4; i++)
                 {
-                    foreach (Projectile proj in Main.ActiveProjectiles)
+                    float fac = MathF.Sin(ConstantTimer * 0.05f + (MathHelper.TwoPi * i / 4f));
+                    Vector2 pos = NPC.Center - new Vector2(0, 300) +
+                                  new Vector2((i - 1.5f) * 100, 40 + fac * 20);
+                    OrbPosition[i] = Vector2.Lerp(OrbPosition[i], pos, 0.1f);
+
+                    if (AITimer > 20 && (int)AITimer % 5 == 0 && Main.netMode != 1)
                     {
-                        if (proj.type == ModContent.ProjectileType<OracleJetBeam>() &&
-                            proj.Distance(OrbPosition[i]) < 10f)
-                            OrbPosition[i] += new Vector2(0, 5).RotatedByRandom(0.5f);
+                        if (AITimer >= 60 && AITimer < 170)
+                        {
+                            foreach (Projectile proj in Main.ActiveProjectiles)
+                            {
+                                if (proj.type == ModContent.ProjectileType<OracleJetBeam>() &&
+                                    proj.Distance(OrbPosition[i]) < 10f)
+                                    OrbPosition[i] += new Vector2(0, 5).RotatedByRandom(0.5f);
+                            }
+                        }
+
+                        if (AITimer < 130 && Main.rand.Next(4) == i)
+                            Projectile.NewProjectile(null, OrbPosition[i], -Vector2.UnitY.RotatedByRandom(0.25f),
+                                ModContent.ProjectileType<OracleJetBeam>(), 25, 0, ai2: 1);
                     }
                 }
 
-                if (AITimer < 130 && Main.rand.Next(4) == i)
-                    Projectile.NewProjectile(null, OrbPosition[i], -Vector2.UnitY.RotatedByRandom(0.25f),
-                        ModContent.ProjectileType<OracleJetBeam>(), 25, 0, ai2: 1);
-            }
-        }
-
-        if (AITimer < 180)
-        {
-            if ((int)AITimer == 175)
-            {
-                Projectile.NewProjectile(null, NPC.Center, Vector2.Zero, ModContent.ProjectileType<Flare>(), 0, 0, -1,
-                    1,
-                    1);
-                Projectile.NewProjectile(null, NPC.Center, Vector2.Zero, ModContent.ProjectileType<Flare>(), 0, 0, -1,
-                    3,
-                    1, 0.1f);
-
-                for (int i = 0; i < 15; i++)
+                if ((int)AITimer == 175)
                 {
-                    Dust.NewDustPerfect(NPC.Center, ModContent.DustType<GlowDust>(),
-                        Main.rand.NextVector2Unit() * Main.rand.NextFloat(5, 8), 0,
-                        Color.CornflowerBlue with { A = 0 });
+                    Projectile.NewProjectile(null, NPC.Center, Vector2.Zero, ModContent.ProjectileType<Flare>(), 0, 0,
+                        -1,
+                        1,
+                        1);
+                    Projectile.NewProjectile(null, NPC.Center, Vector2.Zero, ModContent.ProjectileType<Flare>(), 0, 0,
+                        -1,
+                        3,
+                        1, 0.1f);
+
+                    for (int i = 0; i < 15; i++)
+                    {
+                        Dust.NewDustPerfect(NPC.Center, ModContent.DustType<GlowDust>(),
+                            Main.rand.NextVector2Unit() * Main.rand.NextFloat(5, 8), 0,
+                            Color.CornflowerBlue with { A = 0 });
+                    }
+
+                    if (!Main.dedServ)
+                        Main.instance.CameraModifiers.Add(new PunchCameraModifier(NPC.Center,
+                            Main.rand.NextVector2Unit(),
+                            AITimer / 10f + 2, 20, 5, 1000));
                 }
 
-                if (!Main.dedServ)
-                    Main.instance.CameraModifiers.Add(new PunchCameraModifier(NPC.Center, Main.rand.NextVector2Unit(),
-                        AITimer / 10f + 2, 20, 5, 1000));
-            }
+                EyeTarget = Vector2.Lerp(EyeTarget,
+                    NPC.Center - new Vector2(0, 300) + Main.rand.NextVector2Unit() * AITimer / 180f * 100,
+                    AITimer / 180f * 0.5f);
 
-            EyeTarget = Vector2.Lerp(EyeTarget,
-                NPC.Center - new Vector2(0, 300) + Main.rand.NextVector2Unit() * AITimer / 180f * 100,
-                AITimer / 180f * 0.5f);
-        }
-        else
-        {
-            IdleOrbs(AITimer2 = MathHelper.Lerp(AITimer2, 1, 0.04f));
-            EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.1f);
+                if (AITimer > 180)
+                    IncrementAttackPart();
+                break;
 
-            if (Main.netMode != 1 && (int)AITimer % 7 == 0 && AITimer < 300)
-            {
-                Projectile.NewProjectile(null, Player.Center + new Vector2(Main.rand.NextFloat(-600, 600), -1260),
-                    Vector2.UnitY.RotatedByRandom(0.25f),
-                    ModContent.ProjectileType<OracleJetBeam>(), 25, 0, ai2: 1);
-            }
+            // Main part
+            case 1:
+                IdleOrbs(AITimer2 = MathHelper.Lerp(AITimer2, 1, 0.04f));
+                EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.1f);
+
+                if (Main.netMode != 1 && (int)AITimer % 6 == 0 && AITimer < 120)
+                {
+                    Projectile.NewProjectile(null, Player.Center + new Vector2(Main.rand.NextFloat(-600, 600), -1260),
+                        Vector2.UnitY.RotatedByRandom(0.25f),
+                        ModContent.ProjectileType<OracleJetBeam>(), 25, 0, ai2: 1);
+                }
+
+                break;
         }
 
         return MagicRain;
