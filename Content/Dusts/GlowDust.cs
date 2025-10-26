@@ -11,7 +11,7 @@ public class GlowDust : ModDust
 
     public override void OnSpawn(Dust dust)
     {
-        dust.alpha = 255;
+        dust.alpha = 0;
         dust.noLight = true;
         dust.noGravity = true;
         if (dust.scale is > 0.99f and < 1.01f)
@@ -20,6 +20,8 @@ public class GlowDust : ModDust
 
     public override bool Update(Dust dust)
     {
+        if (dust.alpha < 255)
+            dust.alpha += 17;
         dust.position += dust.velocity;
         dust.velocity *= 0.98f;
         dust.scale *= 0.98f;
@@ -38,7 +40,8 @@ public class GlowDust : ModDust
         if (dust.customData != null)
             scale = Vector2.One * 5;
         Main.spriteBatch.Draw(tex, dust.position - Main.screenPosition, null,
-            dust.color * dust.scale, dust.velocity.ToRotation(), tex.Size() / 2,
+            dust.color with { A = 0 } * dust.scale * (float)(dust.alpha / 255f), dust.velocity.ToRotation(),
+            tex.Size() / 2,
             scale * dust.scale * 0.1f, SpriteEffects.None,
             0);
         return false;

@@ -96,6 +96,10 @@ public class OracleJetBeam : ModProjectile
                             Projectile.velocity,
                             3f, 20, 15));
 
+                    SoundEngine.PlaySound(
+                        new SoundStyle("TheOracle/Assets/Sounds/magicImpact") with { PitchVariance = 0.3f },
+                        Projectile.Center);
+
                     for (int j = 0; j < 5; j++)
                     {
                         Vector2 vel = Projectile.velocity.RotatedByRandom(1.5f);
