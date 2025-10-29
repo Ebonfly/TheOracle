@@ -134,11 +134,16 @@ public class OracleBladeClock : ModProjectile
             col.A = 0;
 
             Main.spriteBatch.Draw(flare, Projectile.Center - Main.screenPosition, null, col,
-                Main.GlobalTimeWrappedHourly * 0.1f,
+                0,
                 flare.Size() / 2, Projectile.scale * 5 + i * 0.005f + _alpha, SpriteEffects.None, 0);
+
             Main.spriteBatch.Draw(flare, Projectile.Center - Main.screenPosition, null, col,
-                Main.GlobalTimeWrappedHourly * 0.1f + MathHelper.PiOver4, flare.Size() / 2,
+                MathHelper.Pi / 6f, flare.Size() / 2,
                 Projectile.scale * 3.5f + i * 0.005f + _alpha * 0.5f, SpriteEffects.None, 0);
+
+            Main.spriteBatch.Draw(flare, Projectile.Center - Main.screenPosition, null, col,
+                MathHelper.Pi / 3f, flare.Size() / 2,
+                Projectile.scale * 2.5f + i * 0.005f + _alpha * 0.5f, SpriteEffects.None, 0);
 
             Main.spriteBatch.Draw(flare,
                 Projectile.Center - Main.screenPosition + Main.rand.NextVector2Circular(15, 15) * _additionalFlare,

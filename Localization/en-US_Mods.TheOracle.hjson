@@ -12,4 +12,6 @@ Projectiles: {
 	TimeReverseVFX.DisplayName: Time Reverse V F X
 	OrbClone.DisplayName: Orb Clone
 	OracleBladeClock.DisplayName: Oracle Blade Clock
+	Phase3Transition_Spear.DisplayName: Phase3 Transition_ Spear
+	Phase3Transition_TheHorns.DisplayName: Phase3 Transition_ The Horns
 }

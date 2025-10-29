@@ -784,6 +784,14 @@ public partial class OracleBoss : ModNPC
 
     int DoGiantClockLaser()
     {
+        switch (AttackPart)
+        {
+            // Init
+            case 0:
+
+                break;
+        }
+
         return GiantClockLaser;
     }
 
