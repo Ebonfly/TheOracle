@@ -6,6 +6,23 @@ namespace TheOracle.Content.Projectiles.VFX;
 
 public class Phase3Transition_TheHorns : ModProjectile
 {
+    public override void Load()
+    {
+        On_Main.DrawBG += (orig, self) =>
+        {
+            foreach (var proj in Main.ActiveProjectiles)
+            {
+                if (proj.type == ModContent.ProjectileType<Phase3Transition_TheHorns>())
+                {
+                    Color c = Color.White;
+                    proj.ModProjectile?.PreDraw(ref c);
+                }
+            }
+
+            orig(self);
+        };
+    }
+
     public override string Texture => QuickAssets.EMPTY_KEY;
 
     public override void SetDefaults()
@@ -14,6 +31,7 @@ public class Phase3Transition_TheHorns : ModProjectile
         Projectile.tileCollide = false;
         Projectile.timeLeft = 300;
         Projectile.aiStyle = -1;
+        Projectile.hide = true;
     }
 
     public override bool? CanDamage() => false;
@@ -21,49 +39,59 @@ public class Phase3Transition_TheHorns : ModProjectile
 
     public override void AI()
     {
-        Projectile.Center = Main.LocalPlayer.Center;
+        if (Main.mouseRight)
+            Projectile.Center = Main.MouseWorld;
         Projectile.timeLeft = 10;
         base.AI();
     }
 
     public override bool PreDraw(ref Color lightColor)
     {
+        //float time = Main.GameUpdateCount * 0.02f;
+        float time = Main.GlobalTimeWrappedHourly;
         Texture2D glow = Images.Extras.Textures.Glow.Value;
         Texture2D flare = Images.Extras.Textures.Crosslight.Value;
-        Texture2D streak = Images.Extras.Textures.Slash.Value;
+        Texture2D flare2 = Images.Extras.Textures.Slash.Value;
 
-        Vector2 pos = new Vector2(Main.screenWidth / 2f, 400);
+        Vector2 pos = Vector2.Lerp(Projectile.Center, Main.LocalPlayer.Center, 0.9f) - Main.screenPosition;
         for (int c = 0; c < 2; c++)
         {
             UnifiedRandom rand = new UnifiedRandom(1291144);
-            Color col = c == 0 ? Color.White with { A = 0 } : Color.Gold with { A = 0 };
-            col *= (MathF.Sin(Main.GlobalTimeWrappedHourly * 0.1f) * 0.1f + 1f);
-
-            Main.spriteBatch.Draw(glow, pos + Main.rand.NextVector2Unit(), null, col, 0,
-                glow.Size() / 2f, .2f, SpriteEffects.None, 0);
 
             for (int i = 0; i < 40; i++)
             {
-                // Draw the little petals
-                float mult = (Main.GlobalTimeWrappedHourly * rand.NextFloat(0.1f, 0.2f) + i * 0.2f) % 1f;
-                Vector2 pos2 = pos + rand.NextVector2Unit().RotatedByRandom(0.01f * MathF.Sin(mult * MathF.PI))
-                    .RotatedBy(Main.GlobalTimeWrappedHourly * 0.01f) * rand.NextFloat(10, 250) * mult;
+                Color col = c == 0
+                    ? Color.Gold with { A = 0 }
+                    : Main.hslToRgb((i / 40f + time * 0.1f) % 1f, 1f, .75f, 0);
+                col *= (MathF.Sin(time * 0.1f) * 0.1f + 1f);
+
+                float angle = MathHelper.TwoPi * i / 40f;
+                float mult = (time * rand.NextFloat(0.1f, 0.2f) + i * 0.2f) % 1f;
+
+                Vector2 pos2 = pos + angle.ToRotationVector2().RotatedBy(time * 0.01f + rand.NextFloat(-0.1f, 0.1f)) *
+                    rand.NextFloat(10, 250) * mult;
 
                 float rotation = (pos - pos2).ToRotation();
 
-                Main.spriteBatch.Draw(glow, pos2 + Main.rand.NextVector2Unit(), null,
-                    col * MathF.Sin(mult * MathF.PI) * 0.1f, rotation + MathHelper.PiOver2,
-                    glow.Size() / 2f, new Vector2(0.1f + 0.3f * (1 - mult), 1.1f - mult * mult), SpriteEffects.None,
+                // Draw the little petals
+
+                Main.spriteBatch.Draw(glow, pos2, null,
+                    col * MathF.Sin(mult * MathF.PI) * 0.2f, rotation + MathHelper.PiOver2,
+                    glow.Size() / 2f, new Vector2(0.1f + 0.2f * (1 - mult), rand.NextFloat(0.7f, 1.1f)),
+                    SpriteEffects.None,
                     0);
 
-                // Draw the tentacles
                 if (i % 4 == 0)
                 {
-                    Vector2 tentacleEnd = pos +
-                                          rand.NextVector2Unit()
-                                              .RotatedBy(MathF.Sin(Main.GlobalTimeWrappedHourly *
-                                                                   rand.NextFloat(0.2f, 1) * 0.1f)) *
-                                          rand.NextFloat(400, 600);
+                    Main.spriteBatch.Draw(flare, pos, null,
+                        col * MathF.Sin(mult * MathF.PI) * 0.25f, rotation + MathHelper.PiOver2,
+                        flare.Size() / 2f, (1.1f - mult * mult) * 2 * rand.NextFloat(0.75f, 1.5f),
+                        SpriteEffects.None, 0);
+
+
+                    // Draw the tentacles
+                    Vector2 tentacleEnd = pos + angle.ToRotationVector2().RotatedBy(MathF.Sin(
+                        time * rand.NextFloat(0.2f, 1)) * 0.1f) * rand.NextFloat(400, 600);
                     rotation = (tentacleEnd - pos).ToRotation();
                     List<VertexPositionColorTexture> vertices = [];
 
@@ -71,24 +99,55 @@ public class Phase3Transition_TheHorns : ModProjectile
                     {
                         UnifiedRandom rand2 = new UnifiedRandom(12415 + i);
                         Vector2 tPos = Vector2.Lerp(pos, tentacleEnd, j) +
-                                       new Vector2(0, MathF.Sin(j * MathHelper.TwoPi - Main.GlobalTimeWrappedHourly *
+                                       new Vector2(0, MathF.Sin(j * MathHelper.TwoPi - time *
                                            rand2.NextFloat(0.2f, 1)) * 40).RotatedBy(rotation);
                         vertices.Add(PrimitiveUtils.AsVertex(
                             tPos + new Vector2(40 * (1 - j), 0).RotatedBy(rotation + MathHelper.PiOver2),
-                            col * (1 - j) * 0.2f,
+                            col * (1 - j) * 0.5f,
                             new Vector2(0, 0)));
                         vertices.Add(PrimitiveUtils.AsVertex(
                             tPos + new Vector2(40 * (1 - j), 0).RotatedBy(rotation - MathHelper.PiOver2),
-                            col * (1 - j) * 0.2f,
+                            col * (1 - j) * 0.5f,
                             new Vector2(1, 1)));
                     }
 
                     if (vertices.Count > 2)
                     {
                         PrimitiveUtils.DrawTexturedPrimitives(vertices.ToArray(), PrimitiveType.TriangleStrip,
-                            Images.Extras.Textures.Tentacle.Value);
+                            Images.Extras.Textures.Tentacle.Value, unscaled: true);
                     }
                 }
+            }
+        }
+
+        // Draw lens flare
+        {
+            UnifiedRandom rand = new UnifiedRandom(1291144);
+            for (int i = 0; i < 20f; i++)
+            {
+                float mult = (time * rand.NextFloat(0.1f, 0.2f) + i * 0.2f) % 1f;
+                Vector2 pos2 = pos +
+                               (Main.rand.NextFloat(-0.005f, 0.005f) + MathHelper.TwoPi * i / 40f +
+                                MathHelper.TwoPi * 0.85f).ToRotationVector2() *
+                               rand.NextFloat(250, 300 + 100 * mult);
+                float rotation = (pos - pos2).ToRotation();
+                Color col = Main.hslToRgb(i / 20f, 1f, .75f, 0) * 0.4f;
+                Main.spriteBatch.Draw(flare2, pos2, null,
+                    col * MathF.Sin(mult * MathF.PI), rotation,
+                    flare2.Size() / 2f,
+                    new Vector2(3f, (1.1f - mult * mult) * rand.NextFloat(2.5f, 3f)) * rand.NextFloat(.25f, .7f),
+                    SpriteEffects.None, 0);
+
+                Main.spriteBatch.Draw(flare, pos - rotation.ToRotationVector2() * rand.NextFloat(200, 250), null,
+                    col * MathF.Sin(mult * MathF.PI) * 0.3f, rotation,
+                    flare.Size() / 2f, new Vector2(1f, 1.1f - mult * mult) * rand.NextFloat(.5f, 1f) * mult,
+                    SpriteEffects.None, 0);
+
+                pos2 = pos + rotation.ToRotationVector2() * rand.NextFloat(200, 250 + 100 * mult);
+                Main.spriteBatch.Draw(flare2, pos2, null,
+                    col * MathF.Sin(mult * MathF.PI), rotation,
+                    flare2.Size() / 2f, new Vector2(0.5f, (1.1f - mult * mult) * 0.8f) * rand.NextFloat(.5f, 1f),
+                    SpriteEffects.None, 0);
             }
         }
 
