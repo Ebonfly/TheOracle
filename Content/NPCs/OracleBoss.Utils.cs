@@ -13,7 +13,7 @@ public partial class OracleBoss : ModNPC
 
     int ResetTo(int move, int idleTime = 200)
     {
-        AttackPart = 0;
+        Substate = 0;
         AITimer = -idleTime;
         AITimer2 = 0;
         AITimer3 = 0;
@@ -27,7 +27,7 @@ public partial class OracleBoss : ModNPC
     void IncrementAttackPart(bool leaveTimer2 = false, bool leaveTimer3 = false, bool leaveLocals = false,
         bool leaveDisposable = false)
     {
-        AttackPart++;
+        Substate++;
         AITimer = 0;
         if (!leaveTimer2)
             AITimer2 = 0;

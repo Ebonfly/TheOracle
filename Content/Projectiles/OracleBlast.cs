@@ -26,6 +26,35 @@ public class OracleBlast : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
+        // V
+        if ((int)Projectile.ai[2] == 5)
+        {
+            Rectangle rect = new Rectangle(906, 1081, 148, 180);
+            Texture2D clock = Images.Extras.Textures.Clock.Value;
+            int dir = Projectile.velocity.X > 0 ? 1 : -1;
+            SpriteEffects effect = dir == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+            float rot = Projectile.rotation + MathHelper.PiOver2 * 1.43f;
+            if (dir == -1)
+                rot -= MathHelper.PiOver2 * .84f;
+
+            for (int i = 0; i < Projectile.oldPos.Length; i++)
+            {
+                float mult = 1f - i / (float)Projectile.oldPos.Length;
+                Main.spriteBatch.Draw(clock, Projectile.oldPos[i] + Projectile.Size / 2 - Main.screenPosition, rect,
+                    Color.CornflowerBlue with { A = 0 } * mult, rot, new Vector2(74, 90),
+                    Projectile.scale * 0.3f * mult, effect, 0);
+            }
+
+            for (int i = 0; i < 2; i++)
+            {
+                Color col = (i == 0 ? Color.White * 0.4f : Color.CornflowerBlue) with { A = 0 };
+                Main.spriteBatch.Draw(clock, Projectile.Center - Main.screenPosition, rect, col,
+                    rot, new Vector2(74, 90), Projectile.scale * 0.3f, effect, 0);
+            }
+
+            return false;
+        }
+
         Texture2D tex = TextureAssets.Projectile[Type].Value;
 
         if ((int)Projectile.ai[2] == 4)
@@ -78,15 +107,20 @@ public class OracleBlast : ModProjectile
 
         switch ((int)Projectile.ai[2])
         {
+            // Curve
             case 1:
                 Projectile.rotation = Projectile.velocity.ToRotation();
                 Projectile.velocity = Projectile.velocity.RotatedBy(0.01f * Projectile.ai[1]) * 1.01f;
                 break;
+
+            // Delayed + Curve
             case 2:
                 Projectile.rotation = Projectile.velocity.ToRotation();
                 if (Projectile.timeLeft > 290)
                     Projectile.velocity = Projectile.velocity.RotatedBy(0.01f * Projectile.ai[1]) * 1.01f;
                 break;
+
+            // Sine
             case 3:
                 if (_initPos == Vector2.Zero)
                 {
@@ -108,6 +142,8 @@ public class OracleBlast : ModProjectile
                 }
 
                 break;
+
+            // Hourglass
             case 4:
                 Projectile.rotation = Projectile.velocity.ToRotation();
 
@@ -116,6 +152,27 @@ public class OracleBlast : ModProjectile
                 Projectile.ai[1]++;
                 if (Projectile.ai[1] is > 180 and < 461)
                     Projectile.velocity = Projectile.velocity.RotatedBy(MathHelper.Pi / 280f);
+                break;
+
+            // V
+            case 5:
+                if (Projectile.ai[0] is < 0 or > Main.maxPlayers)
+                    return;
+                Player target = Main.player[(int)Projectile.ai[0]];
+                if (Projectile.velocity.Length() > 0f)
+                    Projectile.rotation = Projectile.velocity.ToRotation();
+                Projectile.ai[1]++;
+                if (Projectile.ai[1] < 120)
+                    Projectile.velocity *= 0.99f;
+                else if (Projectile.ai[1] < 200 && target.active)
+                {
+                    Projectile.velocity = Vector2.Lerp(Projectile.velocity,
+                        (target.Center - Projectile.Center).SafeNormalize(Vector2.UnitX) *
+                        MathHelper.Lerp(10, 20, (Projectile.ai[1] - 120f) / 80f), 0.04f);
+                }
+                else if (Projectile.velocity.Length() < 20f)
+                    Projectile.velocity *= 1.1f;
+
                 break;
             default:
                 Projectile.rotation = Projectile.velocity.ToRotation();

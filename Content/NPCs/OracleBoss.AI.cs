@@ -20,9 +20,9 @@ public partial class OracleBoss : ModNPC
 
         if (Main.mouseRight)
         {
-            AttackPart = 0;
+            Substate = 0;
             NPC.velocity = (Main.MouseWorld - NPC.Center) * 0.05f;
-            AIState = MagicRain;
+            AIState = OrbConjure;
             EyeTarget = Player.Center;
             AITimer = -50;
             AITimer2 = 0;
@@ -39,6 +39,7 @@ public partial class OracleBoss : ModNPC
         AITimer++;
         if (AITimer < 0)
         {
+            NPC.velocity = Vector2.Lerp(NPC.velocity, (Player.Center - NPC.Center) * 0.05f, 0.1f);
             CrystalOpacity = MathHelper.Lerp(CrystalOpacity, 1f, IdleSpeed);
             EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, IdleSpeed);
             IdleSpeed = MathHelper.Lerp(IdleSpeed, 1f, 0.1f);
