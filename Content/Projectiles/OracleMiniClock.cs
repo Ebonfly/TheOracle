@@ -63,8 +63,7 @@ public class OracleMiniClock : ModProjectile
         if ((int)Projectile.ai[0] == 410)
         {
             Projectile.localAI[0] = 1;
-            SoundEngine.PlaySound(new SoundStyle("TheOracle/Assets/Sounds/clockMagicBurst").WithVolumeScale(3));
-            SoundEngine.PlaySound(new SoundStyle("TheOracle/Assets/Sounds/clockBell").WithVolumeScale(3));
+            SoundEngine.PlaySound(new SoundStyle("TheOracle/Assets/Sounds/Custom/OracleBoss/ClockBell"));
         }
 
         if (Projectile.ai[0] > 340 && Projectile.ai[0] < 360 && Projectile.ai[2] < 1)
