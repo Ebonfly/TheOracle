@@ -1021,27 +1021,54 @@ public partial class OracleBoss : ModNPC
 
     int DoSigilCannonballs()
     {
-        return SigilCannonballs;
-    }
+        IdleCrystal(1);
+        switch (Substate)
+        {
+            // Init
+            case 0:
+                IncrementAttackPart();
+                break;
 
-    int DoHourGlassFall()
-    {
-        return HourGlassFall;
+            // Fire
+            case 1:
+                EyeTarget = Vector2.Lerp(EyeTarget, NPC.Center - new Vector2(0, 200), 0.1f);
+                for (int j = 0; j < Main.rand.Next(1, 4); j++)
+                for (int i = 0; i < 4; i++)
+                {
+                    if (ConstantTimer % 4 == i)
+                        Dust.NewDustPerfect(OrbPosition[i] - new Vector2(0, 10), ModContent.DustType<GlowDustSine>(),
+                            -Vector2.UnitY.RotatedByRandom(1) * Main.rand.NextFloat(5, 10), 0,
+                            Color.CornflowerBlue with { A = 0 });
+
+                    OrbPosition[i] = Vector2.Lerp(OrbPosition[i],
+                        NPC.Center - new Vector2((i - 1.5f) * 200, 400 - 100 * MathF.Abs(i - 1.5f)), 0.1f);
+
+                    if (ConstantTimer % 25 == 0 && ConstantTimer % 4 == i)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), OrbPosition[i],
+                            new Vector2(Main.rand.NextFloat(-3, 3), Main.rand.NextFloat(-20, -15)),
+                            ModContent.ProjectileType<Cannonball>(), 40, 0);
+
+                        AITimer3 = i;
+                        AITimer2 = 1f;
+                    }
+                }
+
+                if (AITimer2 > 0)
+                {
+                    AITimer2 -= 0.1f;
+                    OrbPosition[(int)AITimer3].Y += AITimer2 * 4;
+                }
+
+                break;
+        }
+
+        return SigilCannonballs;
     }
 
     int DoPolaritiesClocks()
     {
         return PolaritiesClocks;
-    }
-
-    int DoHourGlassSand()
-    {
-        return HourGlassSand;
-    }
-
-    int DoOrbElectricity()
-    {
-        return OrbElectricity;
     }
 
     int DoQuartzWatch()
@@ -1054,18 +1081,8 @@ public partial class OracleBoss : ModNPC
         return ElfilisOrbClones;
     }
 
-    int DoBuzzsawClockOrbs()
-    {
-        return BuzzsawClockOrbs;
-    }
-
     int DoCrystalCrackHoming()
     {
         return CrystalCrackHoming;
-    }
-
-    int DoOrbLaserRain()
-    {
-        return OrbLaserRain;
     }
 }
