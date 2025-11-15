@@ -127,6 +127,8 @@ public partial class OracleBoss : ModNPC
 
             // Rest of the slices
             case 3:
+                NPC.velocity = Vector2.Lerp(NPC.velocity, (Player.Center - new Vector2(0, 240) - NPC.Center) * 0.05f,
+                    0.04f * (Substate == 1 ? MathHelper.Clamp(AITimer / 20f, 0, 1) : 1));
                 if (AITimer < 10)
                 {
                     CrystalPosition += CrystalTipDirection *
@@ -531,6 +533,8 @@ public partial class OracleBoss : ModNPC
 
             // Main part
             case 1:
+                NPC.velocity = Vector2.Lerp(NPC.velocity, (Player.Center - new Vector2(0, 240) - NPC.Center) * 0.05f,
+                    0.04f * (Substate == 1 ? MathHelper.Clamp(AITimer / 20f, 0, 1) : 1));
                 IdleOrbs(AITimer2 = MathHelper.Lerp(AITimer2, 1, 0.04f));
                 EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, 0.1f);
 
@@ -1026,13 +1030,29 @@ public partial class OracleBoss : ModNPC
         {
             // Init
             case 0:
-                IncrementAttackPart();
+                IdleOrbs();
+                NPC.localAI[0] = MathHelper.Lerp(NPC.localAI[0], 1, 0.05f);
+
+                if (AITimer > 20)
+                {
+                    for (int i = 0; i < 4; i++)
+                    {
+                        Dust.NewDustPerfect(OrbPosition[i] - new Vector2(0, 10), ModContent.DustType<GlowDustSine>(),
+                            -Vector2.UnitY.RotatedByRandom(1) * Main.rand.NextFloat(10, 20), 0,
+                            Color.CornflowerBlue with { A = 0 }, Scale: AITimer / 60f);
+                    }
+                }
+
+                if (AITimer > 50)
+                    IncrementAttackPart(leaveLocals: true);
                 break;
 
             // Fire
             case 1:
-                EyeTarget = Vector2.Lerp(EyeTarget, NPC.Center - new Vector2(0, 200), 0.1f);
-                for (int j = 0; j < Main.rand.Next(1, 4); j++)
+                NPC.velocity = Vector2.Lerp(NPC.velocity,
+                    (Player.Center + new Vector2(Player.velocity.X * 25, -200) - NPC.Center) * 0.06f, 0.1f);
+
+                EyeTarget = Vector2.Lerp(EyeTarget, NPC.Center - new Vector2(0, 50), 0.1f);
                 for (int i = 0; i < 4; i++)
                 {
                     if (ConstantTimer % 4 == i)
@@ -1041,13 +1061,15 @@ public partial class OracleBoss : ModNPC
                             Color.CornflowerBlue with { A = 0 });
 
                     OrbPosition[i] = Vector2.Lerp(OrbPosition[i],
-                        NPC.Center - new Vector2((i - 1.5f) * 200, 400 - 100 * MathF.Abs(i - 1.5f)), 0.1f);
+                        NPC.Center - new Vector2((i - 1.5f) * 400, 200 - 100 * MathF.Abs(i - 1.5f)),
+                        0.025f + MathF.Abs(i - 1.5f) * 0.1f);
 
-                    if (ConstantTimer % 25 == 0 && ConstantTimer % 4 == i)
+                    if (ConstantTimer % 17 == 0 && ConstantTimer % 4 == i && AITimer < 220)
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), OrbPosition[i],
-                            new Vector2(Main.rand.NextFloat(-3, 3), Main.rand.NextFloat(-20, -15)),
-                            ModContent.ProjectileType<Cannonball>(), 40, 0);
+                        for (int j = 0; j < Main.rand.Next(1, 4); j++)
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), OrbPosition[i],
+                                new Vector2(Main.rand.NextFloat(-3, 3), Main.rand.NextFloat(-20, -15)),
+                                ModContent.ProjectileType<Cannonball>(), 40, 0, ai0: Main.rand.NextFloat(7, 24));
 
                         AITimer3 = i;
                         AITimer2 = 1f;
@@ -1060,6 +1082,41 @@ public partial class OracleBoss : ModNPC
                     OrbPosition[(int)AITimer3].Y += AITimer2 * 4;
                 }
 
+                if (AITimer is > 100 and < 240)
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        Vector2 orb = OrbPosition[Main.rand.Next(4)];
+                        Vector2 pos = orb +
+                                      Main.rand.NextVector2Unit() * 500;
+                        Dust.NewDustPerfect(pos, ModContent.DustType<GlowDust>(),
+                            (orb - new Vector2(0, 40) - pos).SafeNormalize(Vector2.Zero) * 10,
+                            newColor: Color.CornflowerBlue with { A = 0 },
+                            Scale: MathHelper.Lerp(0.9f, 2, (AITimer - 100) / 140f)).noGravity = true;
+                    }
+                }
+
+                if (AITimer > 300)
+                {
+                    SoundEngine.PlaySound(new SoundStyle("TheOracle/Assets/Sounds/OracleBoss/ClockBell"));
+                    for (int i = 0; i < 4; i++)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), OrbPosition[i], Vector2.Zero,
+                            ModContent.ProjectileType<Explosion>(), 40, 0);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), OrbPosition[i], Vector2.Zero,
+                            ModContent.ProjectileType<Flare>(), 0, 0, ai0: 3);
+                    }
+
+                    IncrementAttackPart();
+                }
+
+                break;
+
+            // Breather
+            case 2:
+                NPC.velocity *= 0.98f;
+                if (AITimer > 20)
+                    return ResetTo(OrbConjure);
                 break;
         }
 

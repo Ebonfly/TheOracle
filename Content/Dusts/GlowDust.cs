@@ -25,6 +25,8 @@ public class GlowDust : ModDust
         dust.position += dust.velocity;
         dust.velocity *= 0.98f;
         dust.scale *= 0.98f;
+        if (dust.scale < 0.1f)
+            dust.scale -= 0.01f;
         if (dust.scale <= 0)
             dust.active = false;
 

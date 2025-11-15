@@ -27,6 +27,8 @@ public class GlowDustSine : ModDust
         dust.position += dust.velocity.RotatedBy(MathF.Sin((float)dust.customData) * 0.4f);
         dust.velocity *= 0.965f;
         dust.scale *= 0.99f;
+        if (dust.scale < 0.1f)
+            dust.scale -= 0.01f;
         if (dust.scale <= 0)
             dust.active = false;
 
