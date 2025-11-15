@@ -18,6 +18,9 @@ public partial class OracleBoss : ModNPC
         for (int i = 0; i < OrbPosition.Length; i++)
             SaveOldOrbPosition(i);
 
+        if (!Main.dedServ)
+            HandleIdleSound();
+
         if (Main.mouseRight)
         {
             Substate = 0;
@@ -42,7 +45,7 @@ public partial class OracleBoss : ModNPC
             NPC.velocity = Vector2.Lerp(NPC.velocity, (Player.Center - NPC.Center) * 0.05f, 0.1f);
             CrystalOpacity = MathHelper.Lerp(CrystalOpacity, 1f, IdleSpeed);
             EyeTarget = Vector2.Lerp(EyeTarget, Player.Center, IdleSpeed);
-            IdleSpeed = MathHelper.Lerp(IdleSpeed, 1f, 0.1f);
+            IdleSpeed = MathHelper.Lerp(IdleSpeed, 1f, 0.025f);
             IdleCrystal(IdleSpeed);
             IdleOrbs(IdleSpeed);
             if (AITimer > -30)

@@ -20,6 +20,7 @@ public partial class OracleBoss : ModNPC
         for (int i = 0; i < NPC.localAI.Length; i++)
             NPC.localAI[0] = 0;
         DisposablePosition = Vector2.Zero;
+        IdleSpeed = 0;
         NPC.netUpdate = true;
         return move;
     }
@@ -92,5 +93,21 @@ public partial class OracleBoss : ModNPC
         }
 
         OldOrbPosition[orbIndex, 0] = OrbPosition[orbIndex];
+    }
+
+    public void HandleIdleSound()
+    {
+        if (SoundEngine.TryGetActiveSound(SlotIdIdleSound, out var sound))
+        {
+            sound.Pitch = MathHelper.Lerp(0, 1, MathHelper.Clamp(NPC.velocity.Length() / 25f, 0, 1f));
+            sound.Position = NPC.Center;
+        }
+        else
+        {
+            SlotIdIdleSound = SoundEngine.PlaySound(new SoundStyle("TheOracle/Assets/Sounds/OracleBoss/OracleIdle") with
+            {
+                IsLooped = true
+            }, NPC.Center, (_) => NPC.AnyNPCs(Type) && !Main.gameInactive);
+        }
     }
 }
