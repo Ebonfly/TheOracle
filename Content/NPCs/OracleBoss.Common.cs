@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Utilities;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -31,6 +32,7 @@ public partial class OracleBoss : ModNPC
     public ref float AITimer => ref NPC.ai[1];
     public ref float AITimer2 => ref NPC.ai[2];
     public ref float AITimer3 => ref NPC.ai[3];
+    public SlotId SlotIdIdleSound;
 
     private const int Despawn = -1,
         Intro = 0,

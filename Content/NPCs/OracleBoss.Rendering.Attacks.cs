@@ -101,7 +101,7 @@ public partial class OracleBoss : ModNPC
         Main.spriteBatch.Begin(ss with { effect = Effects.SpriteRotation.Value });
 
         Effects.SpriteRotation.Scale = new Vector2(0.25f, 1);
-        Effects.SpriteRotation.Color = (Color.CornflowerBlue with { A = 0 }).ToVector4() * 4;
+        Effects.SpriteRotation.Color = (Color.CornflowerBlue with { A = 0 }).ToVector4() * 4 * NPC.localAI[0];
         Effects.SpriteRotation.Rotation = Main.GameUpdateCount * 0.1f;
         Effects.SpriteRotation.Apply();
 

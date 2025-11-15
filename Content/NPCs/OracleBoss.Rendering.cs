@@ -53,10 +53,16 @@ public partial class OracleBoss : ModNPC
             spriteBatch.Draw(orbTex, OrbPosition[i] - screenPos, OrbFrame, Color.White, OrbRotation[i],
                 OrbFrame.Size() / 2f, NPC.scale, SpriteEffects.None, 0);
 
-        if ((int)AIState is OrbClockHandSwordForm)
-            DrawSword(spriteBatch, screenPos);
+        // Special Attack VFX
+        if (AITimer >= 0)
+        {
+            if ((int)AIState == OrbClockHandSwordForm)
+                DrawSword(spriteBatch, screenPos);
 
-        DrawSigils(spriteBatch, screenPos);
+            if ((int)AIState == SigilCannonballs)
+                DrawSigils(spriteBatch, screenPos);
+        }
+
         return false;
     }
 
