@@ -1133,19 +1133,39 @@ public partial class OracleBoss : ModNPC
             case 0:
                 IdleOrbs();
 
-                CrystalPosition = Vector2.Lerp(CrystalPosition, NPC.Center - new Vector2(0, 400), 0.025f);
+                CrystalPosition = Vector2.Lerp(CrystalPosition, NPC.Center - new Vector2(0, 200), 0.15f);
+
+                DisposablePosition = CrystalPosition;
 
                 if (AITimer > 50)
-                    IncrementSubstate();
+                    IncrementSubstate(leaveDisposable: true);
                 break;
 
-            // Fly overhead
             case 1:
                 for (int i = 0; i < 4; i++)
                 {
-                    float fac = MathF.Sin(ConstantTimer * 0.05f + (MathHelper.TwoPi * i / 4f));
-                    Vector2 pos = CrystalPosition + new Vector2((i - 1.5f) * 100, 40 + fac * 20);
-                    OrbPosition[i] = Vector2.Lerp(OrbPosition[i], pos, 0.1f);
+                    float fac = MathF.Sin(ConstantTimer * 0.05f + (MathHelper.Pi * i / 4f));
+                    Vector2 pos = CrystalPosition + new Vector2((i - 1.5f) * 100 * fac, fac * 20);
+                    OrbPosition[i] = Vector2.Lerp(OrbPosition[i], pos, AITimer2);
+                }
+
+                if ((int)AITimer == 75)
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(), DisposablePosition,
+                        Vector2.Zero, ModContent.ProjectileType<OrbitalStrikePortal>(), 20, 0,
+                        ai1: NPC.target);
+
+                if (AITimer < 125)
+                    AITimer2 = MathHelper.Lerp(AITimer2, 1, 0.1f);
+                else
+                    AITimer2 = MathHelper.Lerp(AITimer2, 0, 0.1f);
+
+                CrystalPosition = Vector2.Lerp(CrystalPosition,
+                    DisposablePosition + new Vector2(0, -500).RotatedBy(ConstantTimer * 0.1f), 0.05f * AITimer2);
+
+                if (AITimer > 150)
+                {
+                    IdleOrbs();
+                    IdleCrystal();
                 }
 
                 break;

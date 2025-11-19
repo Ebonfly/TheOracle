@@ -17,6 +17,13 @@ Projectiles: {
 	Cannonball.DisplayName: Cannonball
 	Explosion.DisplayName: Explosion
 	OracleP2Pet.DisplayName: Oracle P2 Pet
+	BladeClock.DisplayName: Blade Clock
+	Blast.DisplayName: Blast
+	BlastReversal.DisplayName: Blast Reversal
+	JetBeam.DisplayName: Jet Beam
+	MiniClock.DisplayName: Mini Clock
+	OrbitalStrikePortal.DisplayName: Orbital Strike Portal
+	SkipperProjectile.DisplayName: Skipper Projectile
 }
 
 Buffs: {

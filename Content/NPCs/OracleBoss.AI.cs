@@ -25,7 +25,7 @@ public partial class OracleBoss : ModNPC
         {
             Substate = 0;
             NPC.velocity = (Main.MouseWorld - NPC.Center) * 0.05f;
-            AIState = SigilCannonballs;
+            AIState = OrbitalBeamPortals;
             EyeTarget = Player.Center;
             AITimer = -50;
             AITimer2 = 0;

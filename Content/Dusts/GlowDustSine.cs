@@ -23,8 +23,8 @@ public class GlowDustSine : ModDust
     {
         if (dust.customData is null)
             dust.customData = 0f;
-        dust.customData = (float)dust.customData + 0.1f;
-        dust.position += dust.velocity.RotatedBy(MathF.Sin((float)dust.customData) * 0.4f);
+        dust.customData = (float)dust.customData + 0.05f;
+        dust.position += dust.velocity.RotatedBy(MathF.Sin((float)dust.customData * 2) * 0.4f);
         dust.velocity *= 0.965f;
         dust.scale *= 0.99f;
         if (dust.scale < 0.1f)
@@ -39,7 +39,7 @@ public class GlowDustSine : ModDust
     {
         Texture2D tex = Images.Extras.Textures.Slash.Value;
         Vector2 scale = new Vector2(MathHelper.Clamp(dust.velocity.Length(), 0, 5f), 5f);
-        float rotation = dust.velocity.RotatedBy(MathF.Sin((float)dust.customData) * 0.4f).ToRotation();
+        float rotation = dust.velocity.RotatedBy(MathF.Sin((float)dust.customData * 2) * 0.4f).ToRotation();
         Main.spriteBatch.Draw(tex, dust.position - Main.screenPosition, null,
             dust.color with { A = 0 } * dust.scale * MathHelper.Clamp((float)dust.customData, 0, 1), rotation,
             tex.Size() / 2,
