@@ -1131,6 +1131,9 @@ public partial class OracleBoss : ModNPC
         {
             // Init
             case 0:
+                IdleOrbs();
+
+                CrystalPosition = Vector2.Lerp(CrystalPosition, NPC.Center - new Vector2(0, 400), 0.025f);
 
                 if (AITimer > 50)
                     IncrementSubstate();
@@ -1138,6 +1141,13 @@ public partial class OracleBoss : ModNPC
 
             // Fly overhead
             case 1:
+                for (int i = 0; i < 4; i++)
+                {
+                    float fac = MathF.Sin(ConstantTimer * 0.05f + (MathHelper.TwoPi * i / 4f));
+                    Vector2 pos = CrystalPosition + new Vector2((i - 1.5f) * 100, 40 + fac * 20);
+                    OrbPosition[i] = Vector2.Lerp(OrbPosition[i], pos, 0.1f);
+                }
+
                 break;
 
             // Additional phase 2 burst
