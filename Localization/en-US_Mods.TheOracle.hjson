@@ -16,4 +16,19 @@ Projectiles: {
 	Phase3Transition_TheHorns.DisplayName: Phase3 Transition_ The Horns
 	Cannonball.DisplayName: Cannonball
 	Explosion.DisplayName: Explosion
+	OracleP2Pet.DisplayName: Oracle P2 Pet
+}
+
+Buffs: {
+	OracleP2PetBuff: {
+		DisplayName: Oracle Jr.
+		Description: "'ORACLE DROPPY!!'"
+	}
+}
+
+Items: {
+	KeepsakeOfOblivion: {
+		DisplayName: Keepsake of Oblivion
+		Tooltip: "'Enjoy your destruction.'"
+	}
 }
