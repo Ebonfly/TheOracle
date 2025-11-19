@@ -46,11 +46,12 @@ public partial class OracleBoss : ModNPC
         HourGlassOrbs = 8, // #22 
         GiantClockLaser = 9,
         MagolorFields = 10,
-        SigilCannonballs = 11, // #12     yes
-        PolaritiesClocks = 12, // yes
-        QuartzWatch = 13, // #24  yes
-        ElfilisOrbClones = 14, // yes
-        CrystalCrackHoming = 15; // #20  uhh maybe
+        SigilCannonballs = 11, // #12  
+        OrbitalBeamPortals = 12,
+        PolaritiesClocks = 13,
+        QuartzWatch = 14, // #24  
+        ElfilisOrbClones = 15,
+        CrystalCrackHoming = 16; // #20 
 
     void DoAI()
     {
@@ -69,6 +70,7 @@ public partial class OracleBoss : ModNPC
             GiantClockLaser => DoGiantClockLaser(),
             MagolorFields => DoMagolorFields(),
             SigilCannonballs => DoSigilCannonballs(),
+            OrbitalBeamPortals => DoOrbitalBeamPortals(),
             PolaritiesClocks => DoPolaritiesClocks(),
             QuartzWatch => DoQuartzWatch(),
             ElfilisOrbClones => DoElfilisOrbClones(),

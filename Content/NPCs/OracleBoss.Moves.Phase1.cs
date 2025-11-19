@@ -80,7 +80,7 @@ public partial class OracleBoss : ModNPC
                 }
 
                 if (AITimer >= 40)
-                    IncrementAttackPart();
+                    IncrementSubstate();
                 break;
 
             // Chargeup
@@ -102,7 +102,7 @@ public partial class OracleBoss : ModNPC
                 {
                     CrystalFlash = 1;
                     SoundEngine.PlaySound(SoundID.Item4.WithPitchOffset(-0.5f), CrystalPosition);
-                    IncrementAttackPart();
+                    IncrementSubstate();
                 }
 
                 break;
@@ -122,7 +122,7 @@ public partial class OracleBoss : ModNPC
                     CrystalPosition -= CrystalTipDirection *
                                        MathF.Sin(MathF.Pow(AITimer / 50f, 2) * MathHelper.Pi);
                 if (AITimer >= 60)
-                    IncrementAttackPart();
+                    IncrementSubstate();
                 break;
 
             // Rest of the slices
@@ -227,7 +227,7 @@ public partial class OracleBoss : ModNPC
                         Main.rand.NextVector2Unit(), AITimer / 7f + 2, 20, 5, 1000));
 
                 if (AITimer > 60)
-                    IncrementAttackPart(leaveLocals: true);
+                    IncrementSubstate(leaveLocals: true);
                 break;
 
             // Ominous hover
@@ -269,7 +269,7 @@ public partial class OracleBoss : ModNPC
                 }
 
                 if (AITimer >= 120)
-                    IncrementAttackPart(leaveTimer3: true, leaveLocals: true);
+                    IncrementSubstate(leaveTimer3: true, leaveLocals: true);
                 break;
 
             // Impale move #1
@@ -309,7 +309,7 @@ public partial class OracleBoss : ModNPC
                     NPC.localAI[0] = (OrbPosition[0] - Player.Center).ToRotation();
                 }
                 else
-                    IncrementAttackPart(leaveTimer2: true, leaveTimer3: true, leaveLocals: true);
+                    IncrementSubstate(leaveTimer2: true, leaveTimer3: true, leaveLocals: true);
 
                 break;
 
@@ -337,7 +337,7 @@ public partial class OracleBoss : ModNPC
                             .RotatedBy(MathF.Sin((AITimer - 20) / 10f) * 0.03f) * 80;
                 }
                 else
-                    IncrementAttackPart(leaveTimer2: true, leaveTimer3: true, leaveLocals: true);
+                    IncrementSubstate(leaveTimer2: true, leaveTimer3: true, leaveLocals: true);
 
                 break;
 
@@ -380,7 +380,7 @@ public partial class OracleBoss : ModNPC
                     DisposablePosition = OrbPosition[0];
                 }
                 else
-                    IncrementAttackPart(leaveTimer2: true, leaveTimer3: true, leaveLocals: true, leaveDisposable: true);
+                    IncrementSubstate(leaveTimer2: true, leaveTimer3: true, leaveLocals: true, leaveDisposable: true);
 
                 break;
 
@@ -403,7 +403,7 @@ public partial class OracleBoss : ModNPC
                             ModContent.ProjectileType<CrystalSlice>(), 25, 0);
                 }
                 else
-                    IncrementAttackPart(leaveTimer2: true, leaveTimer3: true, leaveLocals: true);
+                    IncrementSubstate(leaveTimer2: true, leaveTimer3: true, leaveLocals: true);
 
                 break;
 
@@ -528,7 +528,7 @@ public partial class OracleBoss : ModNPC
                     AITimer / 180f * 0.5f);
 
                 if (AITimer > 180)
-                    IncrementAttackPart();
+                    IncrementSubstate();
                 break;
 
             // Main part
@@ -806,7 +806,7 @@ public partial class OracleBoss : ModNPC
                 NPC.velocity = Vector2.Lerp(NPC.velocity, (Player.Center - NPC.Center) * 0.04f, 0.1f);
                 if (AITimer > 60)
                 {
-                    IncrementAttackPart(leaveTimer2: true);
+                    IncrementSubstate(leaveTimer2: true);
                     AITimer3 = ConstantTimer;
                 }
 
@@ -874,7 +874,7 @@ public partial class OracleBoss : ModNPC
 
                 if (AITimer > 120)
                 {
-                    IncrementAttackPart();
+                    IncrementSubstate();
                     DisposablePosition = Player.Center;
 
                     // Shape is determined by the Substate
@@ -1044,7 +1044,7 @@ public partial class OracleBoss : ModNPC
                 }
 
                 if (AITimer > 50)
-                    IncrementAttackPart(leaveLocals: true);
+                    IncrementSubstate(leaveLocals: true);
                 break;
 
             // Fire
@@ -1107,7 +1107,7 @@ public partial class OracleBoss : ModNPC
                             ModContent.ProjectileType<Flare>(), 0, 0, ai0: 3);
                     }
 
-                    IncrementAttackPart();
+                    IncrementSubstate();
                 }
 
                 break;
@@ -1116,11 +1116,36 @@ public partial class OracleBoss : ModNPC
             case 2:
                 NPC.velocity *= 0.98f;
                 if (AITimer > 20)
-                    return ResetTo(OrbConjure);
+                    return ResetTo(OrbitalBeamPortals);
                 break;
         }
 
         return SigilCannonballs;
+    }
+
+    int DoOrbitalBeamPortals()
+    {
+        NPC.velocity = Vector2.Lerp(NPC.velocity,
+            (Player.Center + new Vector2(Player.velocity.X * 25, -200) - NPC.Center) * 0.06f, 0.1f);
+        switch (Substate)
+        {
+            // Init
+            case 0:
+
+                if (AITimer > 50)
+                    IncrementSubstate();
+                break;
+
+            // Fly overhead
+            case 1:
+                break;
+
+            // Additional phase 2 burst
+            case 2:
+                break;
+        }
+
+        return OrbitalBeamPortals;
     }
 
     int DoPolaritiesClocks()
