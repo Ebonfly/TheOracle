@@ -3,7 +3,7 @@ using TheOracle.Content.Dusts;
 
 namespace TheOracle.Content.Projectiles;
 
-public class OracleBladeClock : ModProjectile
+public class BladeClock : ModProjectile
 {
     public override string Texture => "TheOracle/Assets/Images/Extras/clock";
 
@@ -84,7 +84,7 @@ public class OracleBladeClock : ModProjectile
         {
             Projectile.NewProjectile(null, Projectile.Center,
                 (_clockHandRotation).ToRotationVector2(),
-                ModContent.ProjectileType<OracleJetBeam>(), Projectile.damage, 0, ai2: 1);
+                ModContent.ProjectileType<JetBeam>(), Projectile.damage, 0, ai2: 1);
             SoundEngine.PlaySound(new SoundStyle("TheOracle/Assets/Sounds/sliceMagic").WithVolumeScale(3)
                 .WithPitchOffset(-.5f));
         }
@@ -102,7 +102,7 @@ public class OracleBladeClock : ModProjectile
             {
                 Projectile.NewProjectile(null, Projectile.Center,
                     (_clockHandRotation + MathHelper.Pi / 12f).ToRotationVector2(),
-                    ModContent.ProjectileType<OracleJetBeam>(), Projectile.damage, 0, ai2: 1);
+                    ModContent.ProjectileType<JetBeam>(), Projectile.damage, 0, ai2: 1);
             }
 
             _clockHandRotation += MathHelper.Pi / 12f;

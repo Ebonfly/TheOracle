@@ -10,7 +10,7 @@ using TheOracle.Content.Dusts;
 
 namespace TheOracle.Content.Projectiles;
 
-public class OracleMiniClock : ModProjectile
+public class MiniClock : ModProjectile
 {
     public override string Texture => "TheOracle/Assets/Images/Extras/clock";
 
@@ -55,7 +55,7 @@ public class OracleMiniClock : ModProjectile
                     float angle = MathHelper.TwoPi * i / 12f;
                     Projectile.NewProjectile(null, Projectile.Center,
                         (angle).ToRotationVector2(),
-                        ModContent.ProjectileType<OracleJetBeam>(),
+                        ModContent.ProjectileType<JetBeam>(),
                         Projectile.damage, 0);
                 }
         }
@@ -91,7 +91,7 @@ public class OracleMiniClock : ModProjectile
                     Projectile.NewProjectile(null, Projectile.Center,
                         (Projectile.localAI[1] - MathHelper.PiOver2 + j * 0.3f).ToRotationVector2() *
                         (i - MathF.Abs(j * 0.5f)),
-                        ModContent.ProjectileType<OracleSkipperProjectile>(),
+                        ModContent.ProjectileType<SkipperProjectile>(),
                         Projectile.damage, 0, ai1: Projectile.timeLeft);
             }
 

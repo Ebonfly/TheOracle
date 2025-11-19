@@ -4,7 +4,7 @@ using TheOracle.Common.Utils;
 
 namespace TheOracle.Content.Projectiles;
 
-public class OracleBlastReversal : ModProjectile
+public class BlastReversal : ModProjectile
 {
     public override string Texture => "TheOracle/Assets/Images/Projectiles/OracleBlast";
 

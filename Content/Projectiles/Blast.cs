@@ -3,7 +3,7 @@ using TheOracle.Common.Utils;
 
 namespace TheOracle.Content.Projectiles;
 
-public class OracleBlast : ModProjectile
+public class Blast : ModProjectile
 {
     public override string Texture => "TheOracle/Assets/Images/Projectiles/OracleBlast";
 

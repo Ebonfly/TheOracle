@@ -49,7 +49,7 @@ public partial class OracleBoss : ModNPC
         }
 
         if ((int)AITimer == 110 && Main.netMode != NetmodeID.MultiplayerClient)
-            Projectile.NewProjectile(null, EyeTarget, Vector2.Zero, ModContent.ProjectileType<OracleMiniClock>(), 0, 0);
+            Projectile.NewProjectile(null, EyeTarget, Vector2.Zero, ModContent.ProjectileType<MiniClock>(), 0, 0);
 
         if (AITimer > 460)
             return ResetTo((int)AIState + 1, 80);
@@ -487,7 +487,7 @@ public partial class OracleBoss : ModNPC
                         {
                             foreach (Projectile proj in Main.ActiveProjectiles)
                             {
-                                if (proj.type == ModContent.ProjectileType<OracleJetBeam>() &&
+                                if (proj.type == ModContent.ProjectileType<JetBeam>() &&
                                     proj.Distance(OrbPosition[i]) < 10f)
                                     OrbPosition[i] += new Vector2(0, 5).RotatedByRandom(0.5f);
                             }
@@ -495,7 +495,7 @@ public partial class OracleBoss : ModNPC
 
                         if (AITimer < 130 && Main.rand.Next(4) == i)
                             Projectile.NewProjectile(null, OrbPosition[i], -Vector2.UnitY.RotatedByRandom(0.25f),
-                                ModContent.ProjectileType<OracleJetBeam>(), 25, 0, ai2: 1);
+                                ModContent.ProjectileType<JetBeam>(), 25, 0, ai2: 1);
                     }
                 }
 
@@ -542,7 +542,7 @@ public partial class OracleBoss : ModNPC
                 {
                     Projectile.NewProjectile(null, Player.Center + new Vector2(Main.rand.NextFloat(-600, 600), -1260),
                         Vector2.UnitY.RotatedByRandom(0.25f),
-                        ModContent.ProjectileType<OracleJetBeam>(), 25, 0, ai2: 1);
+                        ModContent.ProjectileType<JetBeam>(), 25, 0, ai2: 1);
                 }
 
                 if (AITimer > 140)
@@ -613,7 +613,7 @@ public partial class OracleBoss : ModNPC
         if (AITimer is > 85 and < 150 && (int)AITimer % 2 == 0)
         {
             Projectile.NewProjectile(null, NPC.Center, Main.rand.NextVector2Unit(),
-                ModContent.ProjectileType<OracleBlastReversal>(), 25, 0);
+                ModContent.ProjectileType<BlastReversal>(), 25, 0);
         }
 
         if ((int)AITimer == 300)
@@ -712,7 +712,7 @@ public partial class OracleBoss : ModNPC
         {
             if ((int)AITimer == 61)
                 Projectile.NewProjectile(null, CrystalPosition, Vector2.Zero,
-                    ModContent.ProjectileType<OracleMiniClock>(), 0,
+                    ModContent.ProjectileType<MiniClock>(), 0,
                     0, ai2: 2);
 
             AITimer2 = MathHelper.Lerp(AITimer2, 0.25f, 0.1f);
@@ -753,7 +753,7 @@ public partial class OracleBoss : ModNPC
                             CrystalPosition + pos[index].RotatedBy(AITimer3) -
                             (pos[index].RotatedBy(AITimer3)).SafeNormalize(Vector2.UnitY) * 40,
                             (-pos[index]).SafeNormalize(Vector2.UnitY),
-                            ModContent.ProjectileType<OracleJetBeam>(), 15, 0, ai1: dir * MathHelper.PiOver4,
+                            ModContent.ProjectileType<JetBeam>(), 15, 0, ai1: dir * MathHelper.PiOver4,
                             ai2: 2);
                     }
 
@@ -764,7 +764,7 @@ public partial class OracleBoss : ModNPC
                             Player.Center +
                             new Vector2(Main.rand.NextFloat(-700, 1000), -700 + 1400 * j).RotatedBy(AITimer3),
                             Vector2.UnitY.RotatedBy(AITimer3) * Main.rand.NextFloat(5, 9),
-                            ModContent.ProjectileType<OracleBlast>(),
+                            ModContent.ProjectileType<Blast>(),
                             25,
                             0, ai1: AITimer, ai2: 4);
                 }
@@ -832,7 +832,7 @@ public partial class OracleBoss : ModNPC
                 if ((int)AITimer == 30)
                 {
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), pos, Vector2.Zero,
-                        ModContent.ProjectileType<OracleBladeClock>(), 25, 0);
+                        ModContent.ProjectileType<BladeClock>(), 25, 0);
                 }
 
                 // Attack loops twice in phase 2
@@ -948,7 +948,7 @@ public partial class OracleBoss : ModNPC
 
                                 if (AITimer > 250)
                                     Projectile.NewProjectile(NPC.GetSource_FromAI(), pos, vel,
-                                        ModContent.ProjectileType<OracleBlast>(), 25, 0, ai2: 5);
+                                        ModContent.ProjectileType<Blast>(), 25, 0, ai2: 5);
                             }
                         }
                     }

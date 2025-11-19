@@ -13,7 +13,7 @@ using TheOracle.Content.Projectiles.VFX;
 
 namespace TheOracle.Content.Projectiles;
 
-public class OracleJetBeam : ModProjectile
+public class JetBeam : ModProjectile
 {
     public override string Texture => QuickAssets.EMPTY_KEY;
 
