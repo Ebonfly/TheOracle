@@ -120,13 +120,13 @@ public class BladeClock : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D glow = Images.Extras.Textures.Glow.Value;
-        Texture2D lensflare = Images.Extras.Textures.Lensflare.Value;
-        Texture2D clock = Images.Extras.Textures.Clock.Value;
-        Texture2D clockHand1 = Images.Extras.Textures.ClockHandShort.Value;
-        Texture2D clockHand2 = Images.Extras.Textures.ClockHandLong.Value;
-        Texture2D twirl = Images.Extras.Textures.Twirl[0].Value;
-        Texture2D flare = Images.Extras.Textures.Crosslight.Value;
+        Texture2D glow = Images.Extras.Textures.Glow;
+        Texture2D lensflare = Images.Extras.Textures.Lensflare;
+        Texture2D clock = Images.Extras.Textures.Clock;
+        Texture2D clockHand1 = Images.Extras.Textures.ClockHandShort;
+        Texture2D clockHand2 = Images.Extras.Textures.ClockHandLong;
+        Texture2D twirl = Images.Extras.Textures.Twirl[0];
+        Texture2D flare = Images.Extras.Textures.Crosslight;
 
         for (int i = 0; i < 2; i++)
         {

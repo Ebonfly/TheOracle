@@ -144,14 +144,14 @@ public class JetBeam : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D tex = Images.Extras.Textures.WavyLaser.Value;
-        Texture2D tex2 = Images.Extras.Textures.Tentacle.Value;
+        Texture2D tex = Images.Extras.Textures.WavyLaser;
+        Texture2D tex2 = Images.Extras.Textures.Tentacle;
 
         float len = MathHelper.Lerp(300, 1200, Projectile.ai[0]);
 
         if (Projectile.ai[2] is >= 1 and <= 2)
         {
-            tex = Images.Extras.Textures.Laser.Value;
+            tex = Images.Extras.Textures.Laser;
             len = 2700;
         }
 

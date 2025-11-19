@@ -67,9 +67,9 @@ public class OracleP2Pet : ModProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = TextureAssets.Projectile[Projectile.type].Value;
-        Texture2D glowTexture = Images.Projectiles.Textures.OraclePPet_Glow.Value;
-        Texture2D eyeTexture = Images.Projectiles.Textures.OraclePPet_Eye.Value;
-        Texture2D orbTexture = Images.Projectiles.Textures.OraclePPet_Orb.Value;
+        Texture2D glowTexture = Images.Projectiles.Textures.OraclePPet_Glow;
+        Texture2D eyeTexture = Images.Projectiles.Textures.OraclePPet_Eye;
+        Texture2D orbTexture = Images.Projectiles.Textures.OraclePPet_Orb;
 
         int startY = Projectile.frame * texture.Height / Main.projFrames[Projectile.type];
         Rectangle sourceRectangle = new(0, startY, texture.Width, texture.Height / Main.projFrames[Projectile.type]);

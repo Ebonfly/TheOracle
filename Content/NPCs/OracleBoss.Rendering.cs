@@ -18,11 +18,11 @@ public partial class OracleBoss : ModNPC
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         if (NPC.IsABestiaryIconDummy) return false;
-        Texture2D underlayer = Images.NPCs.Textures.OracleBoss_Underlayer[0].Value;
-        Texture2D underlayer2 = Images.NPCs.Textures.OracleBoss_Underlayer[1].Value;
+        Texture2D underlayer = Images.NPCs.Textures.OracleBoss_Underlayer[0];
+        Texture2D underlayer2 = Images.NPCs.Textures.OracleBoss_Underlayer[1];
 
-        Texture2D crystalTex = Images.NPCs.Textures.OracleCrystal.Value;
-        Texture2D orbTex = Images.NPCs.Textures.OracleOrbs.Value;
+        Texture2D crystalTex = Images.NPCs.Textures.OracleCrystal;
+        Texture2D orbTex = Images.NPCs.Textures.OracleOrbs;
 
         spriteBatch.Draw(underlayer, NPC.Center - screenPos, null, drawColor, NPC.rotation, _mainOrigin, NPC.scale,
             SpriteEffects.None, 0);
@@ -108,9 +108,9 @@ public partial class OracleBoss : ModNPC
             if (vertices[i].Count > 2)
             {
                 PrimitiveUtils.DrawTexturedPrimitives(vertices[i].ToArray(), PrimitiveType.TriangleStrip,
-                    Images.Extras.Textures.LintyTrail.Value);
+                    Images.Extras.Textures.LintyTrail);
                 PrimitiveUtils.DrawTexturedPrimitives(vertices[i].ToArray(), PrimitiveType.TriangleStrip,
-                    Images.Extras.Textures.Tentacle.Value);
+                    Images.Extras.Textures.Tentacle);
             }
         }
 
@@ -121,7 +121,7 @@ public partial class OracleBoss : ModNPC
     void DrawJet(SpriteBatch spriteBatch, Vector2 screenPos)
     {
         int index = MathHelper.Clamp(NPC.frame.X / NPC.frame.Width, 0, 3);
-        Texture2D usedTex = Images.NPCs.Jet.Textures.OracleJet[index].Value;
+        Texture2D usedTex = Images.NPCs.Jet.Textures.OracleJet[index];
 
         Vector2 start = NPC.Center + new Vector2(0, 46).RotatedBy(NPC.rotation);
         Vector2 end = new Vector2(0, 49 + usedTex.Width).RotatedBy(NPC.oldRot[^1]);
@@ -163,7 +163,7 @@ public partial class OracleBoss : ModNPC
 
     void DrawEye(SpriteBatch spriteBatch, Vector2 screenPos)
     {
-        Texture2D eyeTex = Images.NPCs.Textures.OracleEye.Value;
+        Texture2D eyeTex = Images.NPCs.Textures.OracleEye;
         Rectangle eyeFrame = new Rectangle(0, NPC.frame.X / NPC.frame.Width * 20, 18, 20);
         if (Phase2)
             eyeFrame.Y = 4 * 18;
@@ -191,8 +191,8 @@ public partial class OracleBoss : ModNPC
 
     void DrawBody(SpriteBatch spriteBatch, Vector2 screenPos)
     {
-        Texture2D tex = Images.NPCs.Textures.OracleBoss.Value;
-        Texture2D glow = Images.NPCs.Textures.OracleBoss_Glow.Value;
+        Texture2D tex = Images.NPCs.Textures.OracleBoss;
+        Texture2D glow = Images.NPCs.Textures.OracleBoss_Glow;
 
         Vector4 LightingColor(Vector2 offset) =>
             new Vector4(Lighting.GetSubLight(NPC.Center + offset.RotatedBy(NPC.rotation)), 1) * 1.25f;

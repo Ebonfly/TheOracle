@@ -8,12 +8,12 @@ public partial class OracleBoss : ModNPC
 {
     void DrawSword(SpriteBatch spriteBatch, Vector2 screenPos)
     {
-        Texture2D sword = Images.Extras.Textures.ClockHandShort.Value;
-        Texture2D sword2 = Images.Extras.Textures.ClockHandLong.Value;
-        Texture2D flare = Images.Extras.Textures.Lensflare.Value;
-        Texture2D crosslight = Images.Extras.Textures.Crosslight.Value;
-        Texture2D clock = Images.Extras.Textures.Clock.Value;
-        Texture2D glow = Images.Extras.Textures.Glow.Value;
+        Texture2D sword = Images.Extras.Textures.ClockHandShort;
+        Texture2D sword2 = Images.Extras.Textures.ClockHandLong;
+        Texture2D flare = Images.Extras.Textures.Lensflare;
+        Texture2D crosslight = Images.Extras.Textures.Crosslight;
+        Texture2D clock = Images.Extras.Textures.Clock;
+        Texture2D glow = Images.Extras.Textures.Glow;
 
         float scaleX = MathF.Pow(MathHelper.Clamp(AITimer3 * 0.5f, 0, 2), 2);
         float scale = MathF.Pow(MathHelper.Clamp(AITimer3 - 1f, 0, 2), 2);
@@ -94,8 +94,8 @@ public partial class OracleBoss : ModNPC
     {
         if (!Effects.SpriteRotation.IsReady)
             return;
-        Texture2D sigil = Images.Extras.Textures.Rune_alt.Value;
-        Texture2D vortex = Images.Extras.Textures.Vortex.Value;
+        Texture2D sigil = Images.Extras.Textures.Rune_alt;
+        Texture2D vortex = Images.Extras.Textures.Vortex;
 
         Main.spriteBatch.End(out var ss);
         Main.spriteBatch.Begin(ss with { effect = Effects.SpriteRotation.Value });

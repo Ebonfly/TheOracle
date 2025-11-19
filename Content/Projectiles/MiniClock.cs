@@ -104,13 +104,13 @@ public class MiniClock : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D glow = Images.Extras.Textures.Glow.Value;
-        Texture2D lensflare = Images.Extras.Textures.Lensflare.Value;
-        Texture2D clock = Images.Extras.Textures.Clock.Value;
-        Texture2D clockHand1 = Images.Extras.Textures.ClockHandShortAlt.Value;
-        Texture2D clockHand2 = Images.Extras.Textures.ClockHandLongAlt.Value;
-        Texture2D twirl = Images.Extras.Textures.Twirl[2].Value;
-        Texture2D flare = Images.Extras.Textures.Crosslight.Value;
+        Texture2D glow = Images.Extras.Textures.Glow;
+        Texture2D lensflare = Images.Extras.Textures.Lensflare;
+        Texture2D clock = Images.Extras.Textures.Clock;
+        Texture2D clockHand1 = Images.Extras.Textures.ClockHandShortAlt;
+        Texture2D clockHand2 = Images.Extras.Textures.ClockHandLongAlt;
+        Texture2D twirl = Images.Extras.Textures.Twirl[2];
+        Texture2D flare = Images.Extras.Textures.Crosslight;
 
         for (int i = 0; i < 2; i++)
         {
