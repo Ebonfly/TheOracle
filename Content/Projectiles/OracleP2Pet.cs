@@ -18,7 +18,8 @@ public class OracleP2Pet : ModProjectile
         Main.projFrames[Projectile.type] = 4;
         Main.projPet[Projectile.type] = true;
 
-        ProjectileID.Sets.CharacterPreviewAnimations[Projectile.type] = ProjectileID.Sets.SimpleLoop(0, Main.projFrames[Projectile.type], 5)
+        ProjectileID.Sets.CharacterPreviewAnimations[Projectile.type] = ProjectileID.Sets
+            .SimpleLoop(0, Main.projFrames[Projectile.type], 5)
             .WithOffset(-4, -11.5f)
             .WithCode(CharacterPreviewCustomization);
     }
@@ -51,7 +52,7 @@ public class OracleP2Pet : ModProjectile
         if (Projectile.Distance(Owner.Center) > 1200f)
             Projectile.Center = targetPosition;
 
-        Projectile.velocity = Vector2.Lerp(Projectile.velocity,(targetPosition - Projectile.Center) * 0.12f, 0.15f);
+        Projectile.velocity = Vector2.Lerp(Projectile.velocity, (targetPosition - Projectile.Center) * 0.12f, 0.15f);
         Projectile.rotation = Math.Clamp(Projectile.velocity.X * 0.04f, -0.9f, 0.9f);
 
         if (++Projectile.frameCounter > 5)
@@ -66,29 +67,39 @@ public class OracleP2Pet : ModProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = TextureAssets.Projectile[Projectile.type].Value;
-        Texture2D glowTexture = ModContent.Request<Texture2D>("TheOracle/Assets/Images/Projectiles/OracleP2Pet_Glow").Value;
-        Texture2D eyeTexture = ModContent.Request<Texture2D>("TheOracle/Assets/Images/Projectiles/OracleP2Pet_Eye").Value;
-        Texture2D orbTexture = ModContent.Request<Texture2D>("TheOracle/Assets/Images/Projectiles/OracleP2Pet_Orb").Value;
+        Texture2D glowTexture = Images.Projectiles.Textures.OraclePPet_Glow.Value;
+        Texture2D eyeTexture = Images.Projectiles.Textures.OraclePPet_Eye.Value;
+        Texture2D orbTexture = Images.Projectiles.Textures.OraclePPet_Orb.Value;
 
         int startY = Projectile.frame * texture.Height / Main.projFrames[Projectile.type];
         Rectangle sourceRectangle = new(0, startY, texture.Width, texture.Height / Main.projFrames[Projectile.type]);
 
-        Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, sourceRectangle, lightColor, Projectile.rotation, sourceRectangle.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
-        Main.EntitySpriteDraw(glowTexture, Projectile.Center - Main.screenPosition, sourceRectangle, Color.White, Projectile.rotation, sourceRectangle.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
+        Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, sourceRectangle, lightColor,
+            Projectile.rotation, sourceRectangle.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
+        Main.EntitySpriteDraw(glowTexture, Projectile.Center - Main.screenPosition, sourceRectangle, Color.White,
+            Projectile.rotation, sourceRectangle.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
 
         Vector2 eyeOffset = Projectile.velocity * new Vector2(0.4f, 0.15f);
 
         if (eyeOffset.Length() > 4)
             eyeOffset = Vector2.Normalize(eyeOffset) * 4;
 
-        Main.EntitySpriteDraw(eyeTexture, Projectile.Center + eyeOffset - Main.screenPosition, eyeTexture.Bounds, Color.White, Projectile.rotation, eyeTexture.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
+        Main.EntitySpriteDraw(eyeTexture, Projectile.Center + eyeOffset - Main.screenPosition, eyeTexture.Bounds,
+            Color.White, Projectile.rotation, eyeTexture.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
 
         startY = Projectile.frame * orbTexture.Height / Main.projFrames[Projectile.type];
         sourceRectangle = new(0, startY, orbTexture.Width, orbTexture.Height / Main.projFrames[Projectile.type]);
 
-        Main.EntitySpriteDraw(orbTexture, Projectile.Center - new Vector2(22, -20).RotatedBy(Projectile.rotation) + Vector2.One.RotatedBy(Main.GlobalTimeWrappedHourly * 5) * 2 - Main.screenPosition, sourceRectangle, Color.White, Projectile.rotation, sourceRectangle.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
+        Main.EntitySpriteDraw(orbTexture,
+            Projectile.Center - new Vector2(22, -20).RotatedBy(Projectile.rotation) +
+            Vector2.One.RotatedBy(Main.GlobalTimeWrappedHourly * 5) * 2 - Main.screenPosition, sourceRectangle,
+            Color.White, Projectile.rotation, sourceRectangle.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
 
-        Main.EntitySpriteDraw(orbTexture, Projectile.Center + new Vector2(22, 20).RotatedBy(Projectile.rotation) + -Vector2.One.RotatedBy(Main.GlobalTimeWrappedHourly * 5) * 2 - Main.screenPosition, sourceRectangle, Color.White, Projectile.rotation, sourceRectangle.Size() * 0.5f, Projectile.scale, SpriteEffects.FlipHorizontally, 0);
+        Main.EntitySpriteDraw(orbTexture,
+            Projectile.Center + new Vector2(22, 20).RotatedBy(Projectile.rotation) +
+            -Vector2.One.RotatedBy(Main.GlobalTimeWrappedHourly * 5) * 2 - Main.screenPosition, sourceRectangle,
+            Color.White, Projectile.rotation, sourceRectangle.Size() * 0.5f, Projectile.scale,
+            SpriteEffects.FlipHorizontally, 0);
 
         return false;
     }
