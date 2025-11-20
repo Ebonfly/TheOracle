@@ -25,6 +25,18 @@ public class OrbitalStrikePortal : ModProjectile
 
     public override void AI()
     {
+        if (Projectile.timeLeft == 52)
+        {
+            Projectile.NewProjectile(Projectile.InheritSource(Projectile), Projectile.Center, Vector2.Zero,
+                ModContent.ProjectileType<Explosion>(), Projectile.damage, 0);
+
+            for (int i = 0; i < 25; i++)
+                Projectile.NewProjectile(Projectile.InheritSource(Projectile), Projectile.Center,
+                    Vector2.UnitY.RotatedByRandom(MathHelper.Pi) * Main.rand.NextFloat(5, 10),
+                    ModContent.ProjectileType<Blast>(),
+                    Projectile.damage, 0, ai2: 6);
+        }
+
         Projectile.velocity *= 0.9f;
 
         if (Projectile.ai[0] < 60)
@@ -45,7 +57,16 @@ public class OrbitalStrikePortal : ModProjectile
 
         Projectile.ai[0]++;
 
-        if ((int)Projectile.ai[0] % 50 == 0 && Projectile.ai[0] is > 90 and < 300)
+        if ((int)Projectile.ai[0] % 3 == 0 && Projectile.ai[0] is > 90 and < 250)
+        {
+            Vector2 pos = Projectile.Center + Main.rand.NextVector2CircularEdge(1200, 1200);
+            Projectile.NewProjectile(Projectile.InheritSource(Projectile), pos,
+                (Projectile.Center - pos).SafeNormalize(Vector2.One).RotatedBy(0.26f) * 20,
+                ModContent.ProjectileType<Blast>(),
+                Projectile.damage, 0, -1, Projectile.Center.X, Projectile.Center.Y, 6);
+        }
+
+        if ((int)Projectile.ai[0] % 100 == 0 && Projectile.ai[0] is > 90 and < 300)
         {
             for (int i = 0; i < 3; i++)
                 Projectile.NewProjectile(Projectile.InheritSource(Projectile), Projectile.Center,

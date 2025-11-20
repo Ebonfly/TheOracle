@@ -1133,6 +1133,8 @@ public partial class OracleBoss : ModNPC
             case 0:
                 IdleOrbs();
 
+                EyeTarget = Vector2.Lerp(EyeTarget, CrystalPosition, 0.1f);
+
                 CrystalPosition = Vector2.Lerp(CrystalPosition, NPC.Center - new Vector2(0, 200), 0.15f);
 
                 DisposablePosition = CrystalPosition;
@@ -1142,6 +1144,8 @@ public partial class OracleBoss : ModNPC
                 break;
 
             case 1:
+                EyeTarget = Vector2.Lerp(EyeTarget, CrystalPosition, 0.1f);
+
                 for (int i = 0; i < 4; i++)
                 {
                     float fac = MathF.Sin(ConstantTimer * 0.05f + (MathHelper.Pi * i / 4f));
@@ -1160,12 +1164,11 @@ public partial class OracleBoss : ModNPC
                     AITimer2 = MathHelper.Lerp(AITimer2, 0, 0.1f);
 
                 CrystalPosition = Vector2.Lerp(CrystalPosition,
-                    DisposablePosition + new Vector2(0, -500).RotatedBy(ConstantTimer * 0.1f), 0.05f * AITimer2);
+                    DisposablePosition + new Vector2(0, -500).RotatedBy(ConstantTimer * -0.1f), 0.05f * AITimer2);
 
                 if (AITimer > 150)
                 {
-                    IdleOrbs();
-                    IdleCrystal();
+                    return ResetTo((int)AIState);
                 }
 
                 break;

@@ -57,7 +57,7 @@ public class Blast : ModProjectile
 
         Texture2D tex = TextureAssets.Projectile[Type].Value;
 
-        if ((int)Projectile.ai[2] == 4)
+        if ((int)Projectile.ai[2] is 4 or 6)
         {
             for (int i = 0; i < Projectile.oldPos.Length; i++)
             {
@@ -74,7 +74,7 @@ public class Blast : ModProjectile
             Color.White with { A = 0 }, Projectile.rotation, new Vector2(65, 35) / 2, Projectile.scale,
             SpriteEffects.None, 0);
 
-        if ((int)Projectile.ai[2] == 4)
+        if ((int)Projectile.ai[2] is 4 or 6)
         {
             Texture2D flare = Images.Extras.Textures.Crosslight.Value;
             Texture2D lensflare = Images.Extras.Textures.Lensflare.Value;
@@ -174,6 +174,28 @@ public class Blast : ModProjectile
                     Projectile.velocity *= 1.1f;
 
                 break;
+
+            // Portal
+            case 6:
+                Projectile.rotation = Projectile.velocity.ToRotation();
+                Projectile.localAI[0] = MathHelper.Lerp(Projectile.localAI[0], 1, 0.2f);
+
+                if (Projectile.ai[0] > 0 && Projectile.ai[1] > 0)
+                    Projectile.velocity = Projectile.velocity.RotatedBy(-0.01f);
+                else
+                    Projectile.velocity *= 1.01f;
+
+                Vector2 pos = new Vector2(Projectile.ai[0], Projectile.ai[1]);
+                if (Projectile.Distance(pos) < 120f)
+                {
+                    Projectile.velocity *= 0.9f;
+                    Projectile.scale *= 0.9f;
+                }
+
+                if (Projectile.scale < 0.1f)
+                    Projectile.Kill();
+                break;
+
             default:
                 Projectile.rotation = Projectile.velocity.ToRotation();
                 break;
