@@ -10,7 +10,7 @@ using TheOracle.Content.Dusts;
 
 namespace TheOracle.Content.Projectiles;
 
-public class OracleMiniClock : ModProjectile
+public class MiniClock : ModProjectile
 {
     public override string Texture => "TheOracle/Assets/Images/Extras/clock";
 
@@ -55,7 +55,7 @@ public class OracleMiniClock : ModProjectile
                     float angle = MathHelper.TwoPi * i / 12f;
                     Projectile.NewProjectile(null, Projectile.Center,
                         (angle).ToRotationVector2(),
-                        ModContent.ProjectileType<OracleJetBeam>(),
+                        ModContent.ProjectileType<JetBeam>(),
                         Projectile.damage, 0);
                 }
         }
@@ -91,7 +91,7 @@ public class OracleMiniClock : ModProjectile
                     Projectile.NewProjectile(null, Projectile.Center,
                         (Projectile.localAI[1] - MathHelper.PiOver2 + j * 0.3f).ToRotationVector2() *
                         (i - MathF.Abs(j * 0.5f)),
-                        ModContent.ProjectileType<OracleSkipperProjectile>(),
+                        ModContent.ProjectileType<SkipperProjectile>(),
                         Projectile.damage, 0, ai1: Projectile.timeLeft);
             }
 
@@ -104,13 +104,13 @@ public class OracleMiniClock : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D glow = Images.Extras.Textures.Glow.Value;
-        Texture2D lensflare = Images.Extras.Textures.Lensflare.Value;
-        Texture2D clock = Images.Extras.Textures.Clock.Value;
-        Texture2D clockHand1 = Images.Extras.Textures.ClockHandShortAlt.Value;
-        Texture2D clockHand2 = Images.Extras.Textures.ClockHandLongAlt.Value;
-        Texture2D twirl = Images.Extras.Textures.Twirl[2].Value;
-        Texture2D flare = Images.Extras.Textures.Crosslight.Value;
+        Texture2D glow = Images.Extras.Textures.Glow;
+        Texture2D lensflare = Images.Extras.Textures.Lensflare;
+        Texture2D clock = Images.Extras.Textures.Clock;
+        Texture2D clockHand1 = Images.Extras.Textures.ClockHandShortAlt;
+        Texture2D clockHand2 = Images.Extras.Textures.ClockHandLongAlt;
+        Texture2D twirl = Images.Extras.Textures.Twirl[2];
+        Texture2D flare = Images.Extras.Textures.Crosslight;
 
         for (int i = 0; i < 2; i++)
         {

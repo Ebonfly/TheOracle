@@ -95,9 +95,9 @@ public class CrystalSlice : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D tex = Images.Extras.Textures.Tentacle.Value;
+        Texture2D tex = Images.Extras.Textures.Tentacle;
 
-        Texture2D crystalTex = Images.NPCs.Textures.OracleCrystal.Value;
+        Texture2D crystalTex = Images.NPCs.Textures.OracleCrystal;
         Rectangle crystalFrame = new Rectangle(0, 0, 50, 92);
 
         List<VertexPositionColorTexture> vertices = new();

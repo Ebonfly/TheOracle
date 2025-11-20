@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
+using TheOracle.GeneratedAssets.DataStructures;
 
 namespace TheOracle.Common.Utils;
 
@@ -106,6 +107,10 @@ public static class PrimitiveUtils
 
     public static void DrawTexturedPrimitives(VertexPositionColorTexture[] vertices, PrimitiveType type,
         Asset<Texture2D> texture, bool drawBacksides = false, bool actualColor = false, bool unscaled = false) =>
+        DrawTexturedPrimitives(vertices, type, texture.Value, drawBacksides, actualColor, unscaled);
+
+    public static void DrawTexturedPrimitives(VertexPositionColorTexture[] vertices, PrimitiveType type,
+        LazyAsset<Texture2D> texture, bool drawBacksides = false, bool actualColor = false, bool unscaled = false) =>
         DrawTexturedPrimitives(vertices, type, texture.Value, drawBacksides, actualColor, unscaled);
 
     public static void DrawTexturedPrimitives(VertexPositionColorTexture[] vertices, PrimitiveType type,

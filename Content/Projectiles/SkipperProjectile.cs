@@ -9,7 +9,7 @@ using TheOracle.Content.Dusts;
 
 namespace TheOracle.Content.Projectiles;
 
-public class OracleSkipperProjectile : ModProjectile
+public class SkipperProjectile : ModProjectile
 {
     public override string Texture => "TheOracle/Assets/Images/Projectiles/OracleBlast";
 

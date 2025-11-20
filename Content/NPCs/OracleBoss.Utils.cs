@@ -25,7 +25,7 @@ public partial class OracleBoss : ModNPC
         return move;
     }
 
-    void IncrementAttackPart(bool leaveTimer2 = false, bool leaveTimer3 = false, bool leaveLocals = false,
+    void IncrementSubstate(bool leaveTimer2 = false, bool leaveTimer3 = false, bool leaveLocals = false,
         bool leaveDisposable = false)
     {
         Substate++;
