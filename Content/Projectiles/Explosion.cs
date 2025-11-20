@@ -38,7 +38,7 @@ public class Explosion : ModProjectile
 
         for (int num905 = 0; num905 < 10; num905++)
         {
-            int d = Dust.NewDust(Projectile.Center, 1, 1, 31, 0f, 0f, 0,
+            int d = Dust.NewDust(Projectile.Center, 1, 1, DustID.Smoke, 0f, 0f, 0,
                 default(Color), 2.5f);
             Main.dust[d].noGravity = true;
             Main.dust[d].velocity *= 3f;
@@ -46,7 +46,7 @@ public class Explosion : ModProjectile
 
         for (int num899 = 0; num899 < 4; num899++)
         {
-            Dust.NewDust(Projectile.Center, 1, 1, 31, 0f, 0f, 100, Scale: 1.5f);
+            Dust.NewDust(Projectile.Center, 1, 1, DustID.Smoke, 0f, 0f, 100, Scale: 1.5f);
         }
     }
 }
