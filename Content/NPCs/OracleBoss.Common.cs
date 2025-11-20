@@ -5,6 +5,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheOracle.Common.Utils;
+using TheOracle.Content.Items;
 
 namespace TheOracle.Content.NPCs;
 
@@ -98,5 +99,23 @@ public partial class OracleBoss : ModNPC
         NPC.HitSound = SoundID.NPCHit4;
         NPC.DeathSound = SoundID.NPCDeath14;
         NPC.knockBackResist = 0f;
+        NPC.value = Item.buyPrice(0, 80, 0, 0);
+    }
+
+    public override void ModifyNPCLoot(NPCLoot npcLoot)
+    {
+        //npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Items.Placeable.Furniture.MinionBossTrophy>(), 10));
+
+        LeadingConditionRule notExpertRule = new(new Conditions.NotExpert());
+
+        //notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<MinionBossMask>(), 7));
+
+        npcLoot.Add(notExpertRule);
+
+        npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<OracleBossBag>()));
+
+        //npcLoot.Add(ItemDropRule.MasterModeCommonDrop(ModContent.ItemType<Items.Placeable.Furniture.MinionBossRelic>()));
+
+        npcLoot.Add(ItemDropRule.MasterModeDropOnAllPlayers(ModContent.ItemType<KeepsakeOfOblivion>(), 4));
     }
 }
