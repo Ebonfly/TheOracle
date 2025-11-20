@@ -38,4 +38,9 @@ Items: {
 		DisplayName: Keepsake of Oblivion
 		Tooltip: "'Enjoy your destruction.'"
 	}
+
+	OracleBossBag: {
+		DisplayName: Treasure Bag (The Oracle)
+		Tooltip: "{$CommonItemTooltip.RightClickToOpen}"
+	}
 }
