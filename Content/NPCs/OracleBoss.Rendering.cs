@@ -59,7 +59,7 @@ public partial class OracleBoss : ModNPC
             if ((int)AIState == OrbClockHandSwordForm)
                 DrawSword(spriteBatch, screenPos);
 
-            if ((int)AIState == SigilCannonballs)
+            if ((int)AIState is SigilCannonballs or CannonSweep)
                 DrawSigils(spriteBatch, screenPos);
         }
 

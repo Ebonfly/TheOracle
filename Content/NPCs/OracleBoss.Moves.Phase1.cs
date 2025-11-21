@@ -1181,6 +1181,103 @@ public partial class OracleBoss : ModNPC
         return OrbitalBeamPortals;
     }
 
+    int DoCannonSweep()
+    {
+        IdleCrystal(1);
+        switch (Substate)
+        {
+            // Init
+            case 0:
+                IdleOrbs();
+                NPC.localAI[0] = MathHelper.Lerp(NPC.localAI[0], 1, 0.05f);
+
+                if (AITimer > 20)
+                {
+                    for (int i = 0; i < 4; i++)
+                    {
+                        Dust.NewDustPerfect(OrbPosition[i] - new Vector2(0, 10), ModContent.DustType<GlowDustSine>(),
+                            -Vector2.UnitY.RotatedByRandom(1) * Main.rand.NextFloat(10, 20), 0,
+                            Color.CornflowerBlue with { A = 0 }, Scale: AITimer / 60f);
+                    }
+                }
+
+                if (AITimer > 50)
+                    IncrementSubstate(leaveLocals: true);
+                break;
+
+            // Sweep
+            case 1:
+                float progress = AITimer / 160f;
+                NPC.velocity = Vector2.Lerp(NPC.velocity,
+                    (Player.Center +
+                     new Vector2((progress * 2 - 1) * 1200, -MathF.Sin(progress * MathHelper.Pi) * 350) -
+                     NPC.Center) * 0.12f, 0.1f);
+
+                EyeTarget = Vector2.Lerp(EyeTarget, NPC.Center - new Vector2(0, 50), 0.1f);
+                int chosenOrb = Main.rand.Next(4);
+                for (int i = 0; i < 4; i++)
+                {
+                    if (ConstantTimer % 4 == i)
+                        Dust.NewDustPerfect(OrbPosition[i] - new Vector2(0, 10), ModContent.DustType<GlowDustSine>(),
+                            -Vector2.UnitY.RotatedByRandom(1) * Main.rand.NextFloat(5, 10), 0,
+                            Color.CornflowerBlue with { A = 0 });
+
+                    float fac = MathF.Sin(ConstantTimer * 0.15f + (MathHelper.Pi * i / 4f));
+                    Vector2 pos = NPC.Center + new Vector2((i - 1.5f) * 100 * fac, -100 + fac * 20);
+                    OrbPosition[i] = Vector2.Lerp(OrbPosition[i], pos, 0.3f * MathHelper.Clamp(progress * 5, 0, 1));
+
+                    if (ConstantTimer % 8 == 0 && chosenOrb == i && AITimer > 40)
+                    {
+                        for (int j = 0; j < Main.rand.Next(1, 4); j++)
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), OrbPosition[i],
+                                new Vector2(0, Main.rand.NextFloat(-10, -5)),
+                                ModContent.ProjectileType<Cannonball>(), 40, 0, ai0: Main.rand.NextFloat(7, 24));
+
+                        AITimer3 = i;
+                        AITimer2 = 1f;
+                    }
+                }
+
+                if (AITimer2 > 0)
+                {
+                    AITimer2 -= 0.1f;
+                    OrbPosition[(int)AITimer3].Y += AITimer2 * 4;
+                }
+
+                if (AITimer is > 100 and < 140)
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        Vector2 orb = OrbPosition[Main.rand.Next(4)];
+                        Vector2 pos = orb +
+                                      Main.rand.NextVector2Unit() * 500;
+                        Dust.NewDustPerfect(pos, ModContent.DustType<GlowDust>(),
+                            (orb - new Vector2(0, 40) - pos).SafeNormalize(Vector2.Zero) * 10,
+                            newColor: Color.CornflowerBlue with { A = 0 },
+                            Scale: MathHelper.Lerp(0.9f, 2, (AITimer - 100) / 140f)).noGravity = true;
+                    }
+                }
+
+                if (AITimer > 160)
+                {
+                    SoundEngine.PlaySound(new SoundStyle("TheOracle/Assets/Sounds/OracleBoss/ClockBell"));
+                    for (int i = 0; i < 4; i++)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), OrbPosition[i], Vector2.Zero,
+                            ModContent.ProjectileType<Explosion>(), 40, 0);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), OrbPosition[i], Vector2.Zero,
+                            ModContent.ProjectileType<Flare>(), 0, 0, ai0: 3);
+                    }
+
+                    return ResetTo((int)AIState);
+                }
+
+                break;
+        }
+
+        return CannonSweep;
+    }
+
     int DoPolaritiesClocks()
     {
         return PolaritiesClocks;
