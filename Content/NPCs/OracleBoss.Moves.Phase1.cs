@@ -1168,7 +1168,7 @@ public partial class OracleBoss : ModNPC
 
                 if (AITimer > 150)
                 {
-                    return ResetTo((int)AIState);
+                    return ResetTo(CannonSweep);
                 }
 
                 break;
@@ -1269,7 +1269,7 @@ public partial class OracleBoss : ModNPC
                             ModContent.ProjectileType<Flare>(), 0, 0, ai0: 3);
                     }
 
-                    return ResetTo((int)AIState);
+                    return ResetTo(OrbConjure);
                 }
 
                 break;
