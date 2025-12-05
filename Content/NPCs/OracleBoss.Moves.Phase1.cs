@@ -1269,7 +1269,7 @@ public partial class OracleBoss : ModNPC
                             ModContent.ProjectileType<Flare>(), 0, 0, ai0: 3);
                     }
 
-                    return ResetTo(OrbConjure);
+                    return ResetTo(PolaritiesClocks);
                 }
 
                 break;
@@ -1280,6 +1280,46 @@ public partial class OracleBoss : ModNPC
 
     int DoPolaritiesClocks()
     {
+        IdleOrbs();
+        switch (Substate)
+        {
+            // Init
+            case 0:
+                if (AITimer < 21)
+                {
+                    CrystalPosition.Y -= 10 * CrystalOpacity;
+                    CrystalOpacity = MathHelper.Lerp(1, 0, AITimer / 20f);
+                    if (ConstantTimer % 2 == 0)
+                        Projectile.NewProjectile(null, NPC.Center, Vector2.Zero, ModContent.ProjectileType<Flare>(), 0,
+                            0);
+                }
+
+                if (AITimer > 40)
+                    IncrementSubstate();
+                break;
+
+            case 1:
+                CrystalOpacity = 0;
+                if ((int)AITimer == 1)
+                {
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(),
+                        Player.Center + new Vector2(0, 750),
+                        Vector2.Zero, ModContent.ProjectileType<CurveClock>(), 25, 0);
+                }
+
+                if ((int)AITimer % 15 == 0)
+                    for (int i = -1; i < 2; i += 2)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(),
+                            Player.Center + new Vector2(i * 500 * AITimer / 15, 750),
+                            Vector2.Zero, ModContent.ProjectileType<CurveClock>(), 25, 0);
+                    }
+
+                if (AITimer > 50)
+                    IncrementSubstate();
+                break;
+        }
+
         return PolaritiesClocks;
     }
 

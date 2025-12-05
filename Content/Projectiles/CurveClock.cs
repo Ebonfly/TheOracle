@@ -20,7 +20,7 @@ public class CurveClock : ModProjectile
         Projectile.scale = 0f;
         Projectile.friendly = false;
         Projectile.hostile = true;
-        Projectile.timeLeft = 930;
+        Projectile.timeLeft = 860;
         Projectile.aiStyle = -1;
         Projectile.ignoreWater = true;
         Projectile.tileCollide = false;
@@ -75,7 +75,14 @@ public class CurveClock : ModProjectile
                 Projectile.rotation += MathHelper.ToRadians(Projectile.ai[2]);
         }
 
-        if (Projectile.ai[0] > 910)
+        if (Projectile.ai[0] is > 100 and < 840 && (int)Projectile.ai[0] % 125 == 0)
+        {
+            Projectile.NewProjectile(Projectile.InheritSource(Projectile), Projectile.Center,
+                (Projectile.ai[2] < 0 ? Vector2.UnitY : -Vector2.UnitY).RotatedByRandom(1),
+                ModContent.ProjectileType<CrystalSlice>(), 25, 0);
+        }
+
+        if (Projectile.ai[0] > 840)
         {
             _alpha = MathHelper.Lerp(_alpha, 0, 0.1f);
             Projectile.scale = MathHelper.Lerp(Projectile.scale, 0f, 0.1f);
@@ -142,8 +149,10 @@ public class CurveClock : ModProjectile
             Vector2 sPos = Vector2.Lerp(pos1, pos2, i / 100f) - Main.screenPosition;
 
             Color col = Color.CornflowerBlue with { A = 0 } *
-                        MathF.Pow(MathF.Sin(i / 100f * MathHelper.Pi), 3) *
-                        (Projectile.scale / 0.3f) * Projectile.localAI[0];
+                        MathF.Pow(
+                            MathHelper.Clamp(sPos.Distance(pos2 - Main.screenPosition) / 200f, 0, 1) *
+                            MathHelper.Clamp(sPos.Distance(pos1 - Main.screenPosition) / 200f, 0, 1), 2) *
+                        (Projectile.scale / 0.3f) * Projectile.localAI[0] * 1.5f;
 
             for (int j = -1; j < 2; j += 2)
             {
