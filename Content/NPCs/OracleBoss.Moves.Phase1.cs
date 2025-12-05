@@ -1296,27 +1296,41 @@ public partial class OracleBoss : ModNPC
 
                 if (AITimer > 40)
                     IncrementSubstate();
+                EyeTarget = CrystalPosition;
                 break;
 
             case 1:
+                if (AITimer < 15)
+                    EyeTarget = Player.Center;
                 CrystalOpacity = 0;
-                if ((int)AITimer == 1)
-                {
-                    Projectile.NewProjectile(NPC.GetSource_FromThis(),
-                        Player.Center + new Vector2(0, 750),
-                        Vector2.Zero, ModContent.ProjectileType<CurveClock>(), 25, 0);
-                }
 
                 if ((int)AITimer % 15 == 0)
                     for (int i = -1; i < 2; i += 2)
                     {
                         Projectile.NewProjectile(NPC.GetSource_FromThis(),
-                            Player.Center + new Vector2(i * 500 * AITimer / 15, 750),
-                            Vector2.Zero, ModContent.ProjectileType<CurveClock>(), 25, 0);
+                            EyeTarget + new Vector2(i * 500 * (51 - AITimer) / 15, 750),
+                            AITimer < 16 ? Vector2.UnitX * -i : Vector2.Zero, ModContent.ProjectileType<CurveClock>(),
+                            25, 0, ai0: AITimer < 16 ? -1 : 0);
                     }
 
                 if (AITimer > 50)
                     IncrementSubstate();
+                break;
+            case 2:
+                NPC.velocity = Vector2.Lerp(NPC.velocity,
+                    (Player.Center + new Vector2(Player.velocity.X * 25, -200) - NPC.Center) * 0.06f, 0.1f);
+                EyeTarget = Player.Center;
+
+                if (AITimer > 850)
+                    IncrementSubstate();
+                break;
+            case 3:
+                CrystalOpacity = MathHelper.Lerp(0, 1, AITimer / 20f);
+
+                IdleCrystal(CrystalOpacity);
+
+                if (AITimer > 20)
+                    ResetTo(OrbConjure);
                 break;
         }
 

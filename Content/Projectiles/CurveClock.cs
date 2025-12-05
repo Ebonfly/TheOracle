@@ -29,29 +29,52 @@ public class CurveClock : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return base.Colliding(projHitbox, targetHitbox);
+        if (MathF.Abs(Projectile.ai[0]) <= 2 || Projectile.ai[2] < 0)
+            return false;
+
+        Projectile proj = Main.projectile[(int)Projectile.ai[1]];
+
+        for (int i = 2; i < 100; i += 2)
+        {
+            Vector2 pos1 = Vector2.Lerp(Projectile.Center + Projectile.rotation.ToRotationVector2() * 300,
+                Projectile.Center + Projectile.rotation.ToRotationVector2() * 1400, i / 100f);
+            Vector2 pos2 = Vector2.Lerp(
+                Projectile.Center + (proj.Center - Projectile.Center).SafeNormalize(Vector2.One) * 1400,
+                proj.Center + proj.rotation.ToRotationVector2() * 300, i / 100f);
+
+            Vector2 sPos1 = Vector2.Lerp(pos1, pos2, (i - 2) / 100f);
+
+            Vector2 sPos2 = Vector2.Lerp(pos1, pos2, i / 100f);
+
+            float a = 0;
+            if (Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), sPos1, sPos2, 20, ref a))
+                return true;
+        }
+
+        return false;
     }
 
-    public override bool? CanDamage()
-    {
-        return base.CanDamage();
-    }
+    public override bool? CanDamage() => MathF.Abs(Projectile.ai[0]) is > 120 and < 840;
 
     public override bool ShouldUpdatePosition() => false;
 
     public override void AI()
     {
-        Projectile.ai[0]++;
+        if (Projectile.ai[0] < 0)
+            Projectile.ai[0]--;
+        else
+            Projectile.ai[0]++;
 
         if (Projectile.ai[2] == 0 && Projectile.ai[1] == 0 && Main.netMode != 1)
         {
             Projectile.ai[2] = 1;
             Projectile.ai[1] = Projectile.NewProjectile(Projectile.InheritSource(Projectile),
-                Projectile.Center + new Vector2(0, -1500), Vector2.Zero, Type,
-                Projectile.damage, Projectile.knockBack, Projectile.owner, 0, Projectile.whoAmI, ai2: -2);
+                Projectile.Center + new Vector2(0, -1500), Projectile.velocity, Type,
+                Projectile.damage, Projectile.knockBack, Projectile.owner, Projectile.ai[0], Projectile.whoAmI,
+                ai2: -2);
         }
 
-        if (Projectile.ai[0] < 10)
+        if (MathF.Abs(Projectile.ai[0]) < 10)
         {
             Projectile.scale = MathHelper.Lerp(Projectile.scale, 0.3f, 0.2f);
             Projectile.rotation = -MathHelper.PiOver2;
@@ -59,7 +82,7 @@ public class CurveClock : ModProjectile
                 Projectile.rotation = MathHelper.Pi - MathHelper.PiOver2;
         }
 
-        if (Projectile.ai[0] < 60)
+        if (MathF.Abs(Projectile.ai[0]) < 60)
         {
             Vector2 pos = Projectile.Center + Main.rand.NextVector2Circular(50, 50) +
                           Projectile.rotation.ToRotationVector2() * 600;
@@ -68,21 +91,28 @@ public class CurveClock : ModProjectile
                 newColor: Color.CornflowerBlue with { A = 0 }).customData = Main.rand.NextFloat(-1, 1);
         }
 
-        if (Projectile.ai[0] > 100f)
+        if (MathF.Abs(Projectile.ai[0]) > 100f)
         {
             Projectile.localAI[0] = MathHelper.Lerp(Projectile.localAI[0], 1, 0.05f);
-            if (Projectile.ai[0] > 120)
+            if (MathF.Abs(Projectile.ai[0]) > 120)
                 Projectile.rotation += MathHelper.ToRadians(Projectile.ai[2]);
         }
 
-        if (Projectile.ai[0] is > 100 and < 840 && (int)Projectile.ai[0] % 125 == 0)
-        {
+
+        if (MathF.Abs(Projectile.ai[0]) < 780 && Projectile.ai[0] < 0 && (int)Projectile.ai[0] % 10 == 0)
             Projectile.NewProjectile(Projectile.InheritSource(Projectile), Projectile.Center,
-                (Projectile.ai[2] < 0 ? Vector2.UnitY : -Vector2.UnitY).RotatedByRandom(1),
+                Projectile.velocity.RotatedByRandom(0.02f),
                 ModContent.ProjectileType<CrystalSlice>(), 25, 0);
+
+        if (MathF.Abs(Projectile.ai[0]) is > 100 and < 840)
+        {
+            if ((int)Projectile.ai[0] % 125 == 0)
+                Projectile.NewProjectile(Projectile.InheritSource(Projectile), Projectile.Center,
+                    (Projectile.ai[2] < 0 ? Vector2.UnitY : -Vector2.UnitY).RotatedByRandom(1),
+                    ModContent.ProjectileType<CrystalSlice>(), 25, 0);
         }
 
-        if (Projectile.ai[0] > 840)
+        if (MathF.Abs(Projectile.ai[0]) > 840)
         {
             _alpha = MathHelper.Lerp(_alpha, 0, 0.1f);
             Projectile.scale = MathHelper.Lerp(Projectile.scale, 0f, 0.1f);
@@ -132,7 +162,7 @@ public class CurveClock : ModProjectile
                 Projectile.scale * 1.2f, SpriteEffects.None, 0);
         }
 
-        if (Projectile.ai[0] <= 2 || Projectile.ai[2] < 0)
+        if (MathF.Abs(Projectile.ai[0]) <= 2 || Projectile.ai[2] < 0)
             return false;
 
         Projectile proj = Main.projectile[(int)Projectile.ai[1]];
