@@ -13,6 +13,9 @@ public partial class OracleBoss : ModNPC
 {
     public override string Texture => "TheOracle/Assets/Images/NPCs/OracleBoss";
 
+    public static bool AnyOracleIsPhase2;
+    public override void ResetEffects() => AnyOracleIsPhase2 = false;
+
     public bool Phase2;
 
     Vector2[] _cachedEyeOffsets = new Vector2[5];
@@ -35,7 +38,8 @@ public partial class OracleBoss : ModNPC
     public ref float AITimer3 => ref NPC.ai[3];
     public SlotId SlotIdIdleSound;
 
-    private const int Despawn = -1,
+    private const int PhaseTransition = -2,
+        Despawn = -1,
         Intro = 0,
         OrbConjure = 1,
         CrystalSliceDash = 2,
@@ -59,6 +63,7 @@ public partial class OracleBoss : ModNPC
     {
         AIState = AIState switch
         {
+            PhaseTransition => DoPhaseTransition(),
             Despawn => DoDespawn(),
             Intro => DoIntro(),
             OrbConjure => DoOrbConjure(),

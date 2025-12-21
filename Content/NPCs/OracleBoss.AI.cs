@@ -9,6 +9,11 @@ public partial class OracleBoss : ModNPC
 {
     public override void AI()
     {
+        Phase2 = Main.mouseLeft;
+
+        if (Phase2)
+            AnyOracleIsPhase2 = true;
+
         TargetingLogic(0);
         ConstantTimer++;
 
@@ -25,7 +30,7 @@ public partial class OracleBoss : ModNPC
         {
             Substate = 0;
             NPC.velocity = (Main.MouseWorld - NPC.Center) * 0.05f;
-            AIState = PolaritiesClocks;
+            AIState = PhaseTransition;
             EyeTarget = Player.Center;
             AITimer = -50;
             AITimer2 = 0;
