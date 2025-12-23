@@ -237,6 +237,18 @@ public partial class OracleBoss : ModNPC
 
     public Rectangle OrbFrame;
 
+    public enum OrbPhase2AnimationType : byte
+    {
+        TransitionToHand,
+        Idle,
+        Claw,
+        Disappear,
+        TransitionToBlackHole,
+        BlackHole
+    }
+
+    public OrbPhase2AnimationType OrbAnimation;
+
     public override void FindFrame(int frameHeight)
     {
         OrbFrame.Width = 110;
