@@ -114,7 +114,8 @@ public static class PrimitiveUtils
         DrawTexturedPrimitives(vertices, type, texture.Value, drawBacksides, actualColor, unscaled);
 
     public static void DrawTexturedPrimitives(VertexPositionColorTexture[] vertices, PrimitiveType type,
-        Texture2D texture, bool drawBacksides = false, bool actualColor = false, bool unscaled = false)
+        Texture2D texture, bool drawBacksides = false, bool actualColor = false, bool unscaled = false,
+        bool dontMult = false)
     {
         if (!Effects.TrailShader.IsReady) return;
         GraphicsDevice device = Main.graphics.GraphicsDevice;
@@ -122,6 +123,7 @@ public static class PrimitiveUtils
         effect.Parameters["WorldViewProjection"].SetValue(unscaled ? GetMatrixUnscaled() : GetMatrix());
         effect.Parameters["tex"].SetValue(texture);
         effect.Parameters["useActualCol"].SetValue(actualColor);
+        effect.Parameters["dontMult"].SetValue(dontMult);
         effect.CurrentTechnique.Passes["Texture"].Apply();
         if (drawBacksides)
         {

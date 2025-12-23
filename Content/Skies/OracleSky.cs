@@ -27,11 +27,13 @@ public class OracleSky : CustomSky
 {
     public bool Active;
     public float Intensity;
+    public float Transition;
     public override float GetCloudAlpha() => MathHelper.Lerp(base.GetCloudAlpha(), .05f, Intensity);
 
     public override void Reset()
     {
         Active = false;
+        Transition = 0f;
         Intensity = 0f;
     }
 
@@ -49,43 +51,52 @@ public class OracleSky : CustomSky
 
     public override void Update(GameTime gameTime)
     {
-        Intensity = MathHelper.Lerp(Intensity, (float)Active.ToInt(), 0.1f);
+        Intensity = MathHelper.Lerp(Intensity, Active.ToInt(), 0.1f);
         if (Intensity < 0.01f)
             Intensity = 0;
+
+        if (OracleBoss.AnyOracleIsPhase2)
+            Transition = MathHelper.Lerp(Transition, 1f, 0.001f + MathHelper.Clamp(Transition, 0, 0.01f));
+        else
+            Transition = MathHelper.Lerp(Transition, 0f, 0.02f);
     }
 
     public override void Draw(SpriteBatch spriteBatch, float minDepth, float maxDepth)
     {
-        if (OracleBoss.AnyOracleIsPhase2 || (maxDepth >= 3.40282347E+38f && minDepth < 3.40282347E+38f))
+        if (maxDepth >= 3.40282347E+38f && minDepth < 3.40282347E+38f)
         {
             spriteBatch.End(out var ss);
             spriteBatch.Begin(ss with
             {
                 blendState = BlendState.Additive, samplerState = SamplerState.LinearWrap,
-                effect = OracleBoss.AnyOracleIsPhase2 ? Effects.PhaseTwoSky.Shader : Effects.PhaseOneSky.Shader
+                effect = Effects.PhaseTwoSky.Shader
             });
 
-            if (OracleBoss.AnyOracleIsPhase2)
-            {
-                Effects.PhaseTwoSky.Time = Time;
-                Effects.PhaseTwoSky.Opacity = Intensity * 0.2f;
-                if (maxDepth >= 3.40282347E+38f && minDepth < 3.40282347E+38f)
-                {
-                    Effects.PhaseTwoSky.Opacity = Intensity * 1.5f;
-                    Effects.PhaseTwoSky.Time = Time * 0.25f;
-                }
-
-                Effects.PhaseTwoSky.ApplySky();
-            }
-            else
-            {
-                Effects.PhaseOneSky.Time = Time;
-                Effects.PhaseOneSky.Opacity = Intensity;
-                Effects.PhaseOneSky.ApplySky();
-            }
-
+            Effects.PhaseTwoSky.Opacity = Intensity * 1.5f;
+            Effects.PhaseTwoSky.Time = Time * 0.25f;
+            Effects.PhaseTwoSky.TransitionTime = Time;
+            Effects.PhaseTwoSky.Transition = Transition * 50;
+            Effects.PhaseTwoSky.ApplySky();
             Main.graphics.GraphicsDevice.Textures[1] = Images.Noise.Textures.SmearNoise;
+            Main.graphics.GraphicsDevice.Textures[2] = Images.Noise.Textures.SmearNoise;
             Rectangle rect = new Rectangle(0, 0, Main.screenWidth, Main.screenHeight);
+            spriteBatch.Draw(Images.Noise.Textures.SwirlyNoise, rect, Color.White);
+
+            spriteBatch.End();
+            spriteBatch.Begin(ss with
+            {
+                blendState = BlendState.Additive, samplerState = SamplerState.LinearWrap,
+                effect = Effects.PhaseOneSky.Shader
+            });
+            Main.graphics.GraphicsDevice.Textures[1] = Images.Noise.Textures.SmearNoise;
+            Main.graphics.GraphicsDevice.Textures[2] = Images.Noise.Textures.SmearNoise;
+
+            Effects.PhaseOneSky.Time = Time;
+            Effects.PhaseOneSky.Opacity = Intensity;
+            Effects.PhaseOneSky.TransitionTime = Time;
+            Effects.PhaseOneSky.Transition = Transition * 2;
+            Effects.PhaseOneSky.ApplySky();
+
             spriteBatch.Draw(Images.Noise.Textures.SwirlyNoise, rect, Color.White);
 
             spriteBatch.End();

@@ -20,6 +20,7 @@ sampler2D texSampler = sampler_state
     AddressV = Wrap;
 };
 bool useActualCol = false;
+bool dontMult = false;
 matrix WorldViewProjection;
 PSInput MainVS(VSInput input)
 {
@@ -39,9 +40,13 @@ float4 TexturePS(PSInput input) : COLOR0
 {
     float4 c = tex2D(texSampler, input.TexCoord);
     float4 col = input.Color * max(c.r, max(c.g, c.b));
+    
     if (useActualCol)
         col = c * max(c.r, max(c.g, c.b)) * input.Color.a;
 
+    if (dontMult) 
+        col = c;
+    
     return col;
 }
 

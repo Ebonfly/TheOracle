@@ -53,8 +53,11 @@ public partial class OracleBoss : ModNPC
         DrawTentacles(spriteBatch, screenPos);
 
         for (int i = 0; i < OrbPosition.Length; i++)
-            spriteBatch.Draw(orbTex, OrbPosition[i] - screenPos, OrbFrame, Color.White, OrbRotation[i],
-                OrbFrame.Size() / 2f, NPC.scale, SpriteEffects.None, 0);
+        {
+            spriteBatch.Draw(orbTex, OrbPosition[i] - screenPos, OrbFrame, Color.White * (Phase2 ? 0.9f : 1),
+                OrbRotation[i],
+                OrbFrame.Size() / 2f, NPC.scale, i % 3 == 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+        }
 
         // Special Attack VFX
         if (AITimer >= 0)
@@ -161,7 +164,8 @@ public partial class OracleBoss : ModNPC
                 ss.depthStencilState, RasterizerState.CullNone, null, ss.matrix);
 
             PrimitiveUtils.DrawTexturedPrimitives(vertices.ToArray(), PrimitiveType.TriangleStrip, usedTex, false,
-                true);
+                true, dontMult: Phase2);
+
             spriteBatch.End();
             spriteBatch.Begin(ss);
         }
@@ -172,7 +176,7 @@ public partial class OracleBoss : ModNPC
         Texture2D eyeTex = Images.NPCs.Textures.OracleEye;
         Rectangle eyeFrame = new Rectangle(0, NPC.frame.X / NPC.frame.Width * 20, 18, 20);
         if (Phase2)
-            eyeFrame.Y = 4 * 18;
+            eyeFrame.Y = 4 * 20;
 
         Vector2 eyeOffset = Vector2.Zero;
         eyeOffset += (EyeTarget - NPC.Center) * 0.1f;
@@ -185,7 +189,7 @@ public partial class OracleBoss : ModNPC
         for (int i = 0; i < _cachedEyeOffsets.Length; i++)
         {
             spriteBatch.Draw(eyeTex, NPC.Center + _cachedEyeOffsets[i] - screenPos,
-                new Rectangle(0, Phase2 ? 4 * 18 : 0, 18, 20),
+                new Rectangle(0, Phase2 ? 4 * 20 : 0, 18, 20),
                 Color.Gray * MathF.Pow(1f - i / (float)_cachedEyeOffsets.Length, 2f), 0, new Vector2(18) / 2,
                 NPC.scale + MathF.Sin(Main.GlobalTimeWrappedHourly * 2) * 0.3f,
                 SpriteEffects.None, 0);
@@ -256,8 +260,12 @@ public partial class OracleBoss : ModNPC
         OrbFrame.Width = 110;
         OrbFrame.Height = 136;
 
-        if (!Phase2)
+        if (!Phase2 && OrbAnimation == OrbPhase2AnimationType.TransitionToHand)
+        {
             OrbFrame.Y = 0;
+        }
+        else if (!Phase2)
+            OrbAnimation = OrbPhase2AnimationType.TransitionToBlackHole;
 
         NPC.frame.Width = 202;
 
@@ -271,7 +279,7 @@ public partial class OracleBoss : ModNPC
             else
                 NPC.frame.X = 0;
 
-            if (!Phase2)
+            if (!Phase2 && OrbAnimation == OrbPhase2AnimationType.TransitionToHand)
             {
                 if (OrbFrame.X < 3 * OrbFrame.Width)
                     OrbFrame.X += OrbFrame.Width;
@@ -373,7 +381,12 @@ public partial class OracleBoss : ModNPC
                             if (OrbFrame.Y > OrbFrame.Height)
                                 OrbFrame.Y -= OrbFrame.Height;
                             else
-                                OrbAnimation = OrbPhase2AnimationType.BlackHole;
+                            {
+                                if (Phase2)
+                                    OrbAnimation = OrbPhase2AnimationType.BlackHole;
+                                else
+                                    OrbAnimation = OrbPhase2AnimationType.TransitionToHand;
+                            }
                         }
                     }
                         break;

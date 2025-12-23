@@ -1,9 +1,14 @@
 sampler2D tex0 : register(s0);
 sampler2D tex1 : register(s1);
+sampler2D tex2 : register(s2);
+
 float4 uColor = float4(0.5, 1, 2.5, 1);
 float4 uColor2 = float4(0.5, 1.15, 1.5, 1);
 float uOpacity;
 float uTime;
+
+float uTransition;
+float uTransitionTime;
 
 float4 main(float2 uv : TEXCOORD) : COLOR
 {
@@ -17,7 +22,9 @@ float4 main(float2 uv : TEXCOORD) : COLOR
     
     float4 final = pow(c,2.5-c2*3)*2 * uv.y;
     
-    return final * lerp(uColor2*1.25, uColor,uv.y) * uOpacity;
+    float4 transition = saturate(tex2D(tex2, uv + float2(uTransitionTime, 0)) * tex2D(tex2, uv + float2(uTransitionTime*0.5, 0))*uTransition);
+    
+    return saturate(final * lerp(uColor2*1.25, uColor,uv.y) * uOpacity) - transition;
 }
 
 Technique techique1
