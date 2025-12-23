@@ -91,9 +91,11 @@ public partial class OracleBoss : ModNPC
             for (float j = 0; j < 1f; j += 0.1f)
             {
                 Vector2 pos = Vector2.Lerp(Vector2.Lerp(start, halfway, j * 2), Vector2.Lerp(halfway, end, j * 2), j);
-                Color col = Color.CornflowerBlue * MathF.Pow(1 - j, 2) *
+
+                Color col = (Phase2 ? Color.DarkViolet : Color.CornflowerBlue) * MathF.Pow(1 - j, 2) *
                             (1f + MathF.Sin(Main.GlobalTimeWrappedHourly * 10) * 0.2f) *
                             MathHelper.Lerp(0, 1, MathHelper.Clamp(j * 10, 0, 1));
+
                 Vector2 offset = new Vector2(20, 0).RotatedBy((end - start).ToRotation());
                 vertices[i].Add(PrimitiveUtils.AsVertex(pos + offset.RotatedBy(MathHelper.PiOver2), col,
                     new Vector2(-j + Main.GlobalTimeWrappedHourly * 2, 0)));
