@@ -27,14 +27,17 @@ public partial class OracleBoss : ModNPC
         spriteBatch.Draw(underlayer, NPC.Center - screenPos, null, drawColor, NPC.rotation, _mainOrigin, NPC.scale,
             SpriteEffects.None, 0);
 
-        Rectangle crystalFrame = new Rectangle(0, NPC.frame.X / NPC.frame.Width * 92, 50, 92);
+        if (!Phase2)
+        {
+            Rectangle crystalFrame = new Rectangle(0, NPC.frame.X / NPC.frame.Width * 92, 50, 92);
 
-        spriteBatch.Draw(crystalTex, CrystalPosition - screenPos, crystalFrame,
-            Color.White with { A = 0 } * CrystalFlash * 2, CrystalRotation,
-            crystalFrame.Size() / 2f, NPC.scale + (1 - CrystalFlash) * CrystalOpacity, SpriteEffects.None, 0);
+            spriteBatch.Draw(crystalTex, CrystalPosition - screenPos, crystalFrame,
+                Color.White with { A = 0 } * CrystalFlash * 2, CrystalRotation,
+                crystalFrame.Size() / 2f, NPC.scale + (1 - CrystalFlash) * CrystalOpacity, SpriteEffects.None, 0);
 
-        spriteBatch.Draw(crystalTex, CrystalPosition - screenPos, crystalFrame, Color.White * CrystalOpacity,
-            CrystalRotation, crystalFrame.Size() / 2f, NPC.scale, SpriteEffects.None, 0);
+            spriteBatch.Draw(crystalTex, CrystalPosition - screenPos, crystalFrame, Color.White * CrystalOpacity,
+                CrystalRotation, crystalFrame.Size() / 2f, NPC.scale, SpriteEffects.None, 0);
+        }
 
         CrystalFlash = MathHelper.Lerp(CrystalFlash, 0, 0.15f);
 
@@ -121,6 +124,7 @@ public partial class OracleBoss : ModNPC
     void DrawJet(SpriteBatch spriteBatch, Vector2 screenPos)
     {
         int index = MathHelper.Clamp(NPC.frame.X / NPC.frame.Width, 0, 3);
+        if (Phase2) index += 4;
         Texture2D usedTex = Images.NPCs.Jet.Textures.OracleJet[index];
 
         Vector2 start = NPC.Center + new Vector2(0, 46).RotatedBy(NPC.rotation);
@@ -178,15 +182,15 @@ public partial class OracleBoss : ModNPC
 
         for (int i = 0; i < _cachedEyeOffsets.Length; i++)
         {
-            spriteBatch.Draw(eyeTex, NPC.Center + _cachedEyeOffsets[i] - screenPos, new Rectangle(0, 0, 18, 20),
+            spriteBatch.Draw(eyeTex, NPC.Center + _cachedEyeOffsets[i] - screenPos,
+                new Rectangle(0, Phase2 ? 4 * 18 : 0, 18, 20),
                 Color.Gray * MathF.Pow(1f - i / (float)_cachedEyeOffsets.Length, 2f), 0, new Vector2(18) / 2,
                 NPC.scale + MathF.Sin(Main.GlobalTimeWrappedHourly * 2) * 0.3f,
                 SpriteEffects.None, 0);
         }
 
         spriteBatch.Draw(eyeTex, NPC.Center + eyeOffset - screenPos, eyeFrame, Color.White, 0, new Vector2(18) / 2,
-            NPC.scale,
-            SpriteEffects.None, 0);
+            NPC.scale, SpriteEffects.None, 0);
     }
 
     void DrawBody(SpriteBatch spriteBatch, Vector2 screenPos)
@@ -239,8 +243,7 @@ public partial class OracleBoss : ModNPC
         OrbFrame.Height = 136;
         NPC.frame.Width = 202;
 
-        if (Phase2)
-            NPC.frame.Y = frameHeight;
+        NPC.frame.Y = frameHeight * Phase2.ToInt();
 
         NPC.frameCounter++;
         if (NPC.frameCounter % 5 == 0)
