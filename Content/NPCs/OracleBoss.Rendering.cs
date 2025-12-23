@@ -253,6 +253,10 @@ public partial class OracleBoss : ModNPC
     {
         OrbFrame.Width = 110;
         OrbFrame.Height = 136;
+
+        if (!Phase2)
+            OrbFrame.Y = 0;
+
         NPC.frame.Width = 202;
 
         NPC.frame.Y = frameHeight * Phase2.ToInt();
@@ -265,10 +269,123 @@ public partial class OracleBoss : ModNPC
             else
                 NPC.frame.X = 0;
 
-            if (OrbFrame.X < 3 * OrbFrame.Width)
-                OrbFrame.X += OrbFrame.Width;
+            if (!Phase2)
+            {
+                if (OrbFrame.X < 3 * OrbFrame.Width)
+                    OrbFrame.X += OrbFrame.Width;
+                else
+                    OrbFrame.X = 0;
+            }
             else
-                OrbFrame.X = 0;
+            {
+                switch (OrbAnimation)
+                {
+                    case OrbPhase2AnimationType.TransitionToHand:
+                    {
+                        if (OrbFrame.Y < OrbFrame.Height)
+                            OrbFrame.Y = OrbFrame.Height;
+                        if (OrbFrame.Y > OrbFrame.Height * 3)
+                            OrbFrame.Y = OrbFrame.Height * 3;
+
+                        OrbFrame.X += OrbFrame.Width;
+                        if (OrbFrame.X > OrbFrame.Width * 4)
+                        {
+                            OrbFrame.X = 0;
+                            OrbFrame.Y += OrbFrame.Height;
+                        }
+
+                        if (OrbFrame.Y > OrbFrame.Height * 3)
+                            OrbAnimation = OrbPhase2AnimationType.Idle;
+                    }
+                        break;
+                    case OrbPhase2AnimationType.Idle:
+                    {
+                        OrbFrame.Y = OrbFrame.Height * 4;
+
+                        if (OrbFrame.X < 2 * OrbFrame.Width)
+                            OrbFrame.X += OrbFrame.Width;
+                        else
+                            OrbFrame.X = 0;
+                    }
+                        break;
+                    case OrbPhase2AnimationType.Claw:
+                    {
+                        OrbFrame.X += OrbFrame.Width;
+
+                        if (OrbFrame.X > OrbFrame.Width)
+                            OrbFrame.X = OrbFrame.Width * 3;
+                        if (OrbFrame.X > OrbFrame.Width * 4)
+                            OrbFrame.X = 0;
+
+                        if (OrbFrame.X > OrbFrame.Width * 2)
+                            OrbFrame.Y = OrbFrame.Height * 4;
+                        else
+                            OrbFrame.Y = OrbFrame.Height * 3;
+                    }
+                        break;
+                    case OrbPhase2AnimationType.Disappear:
+                    {
+                        if (OrbFrame.Y < OrbFrame.Height)
+                            OrbFrame.Y = OrbFrame.Height;
+                        if (OrbFrame.Y > OrbFrame.Height * 3)
+                            OrbFrame.Y = OrbFrame.Height * 3;
+
+                        if (OrbFrame.Y > OrbFrame.Height * 2)
+                        {
+                            OrbFrame.X -= OrbFrame.Width;
+                            if (OrbFrame.X < 0)
+                            {
+                                OrbFrame.Y -= OrbFrame.Height;
+                                OrbFrame.X = OrbFrame.Width * 4;
+                            }
+                        }
+                        else if (OrbFrame.Y > OrbFrame.Height)
+                        {
+                            if (OrbFrame.X > OrbFrame.Width)
+                                OrbFrame.X -= OrbFrame.Width;
+                            else if (OrbFrame.X == 0)
+                                OrbFrame.X += OrbFrame.Width;
+                        }
+                        else if (OrbFrame.Y == OrbFrame.Height)
+                        {
+                            OrbFrame.X += OrbFrame.Width;
+                            if (OrbFrame.X > OrbFrame.Height * 4)
+                            {
+                                OrbFrame.Y += OrbFrame.Height;
+                                OrbFrame.X = 0;
+                            }
+                        }
+                    }
+                        break;
+                    case OrbPhase2AnimationType.TransitionToBlackHole:
+                    {
+                        if (OrbFrame.Y < OrbFrame.Height)
+                            OrbFrame.Y = OrbFrame.Height;
+                        if (OrbFrame.Y > OrbFrame.Height * 3)
+                            OrbFrame.Y = OrbFrame.Height * 3;
+
+                        OrbFrame.X -= OrbFrame.Width;
+                        if (OrbFrame.X < 0)
+                        {
+                            OrbFrame.X = OrbFrame.Width * 4;
+                            if (OrbFrame.Y > OrbFrame.Height)
+                                OrbFrame.Y -= OrbFrame.Height;
+                            else
+                                OrbAnimation = OrbPhase2AnimationType.BlackHole;
+                        }
+                    }
+                        break;
+                    case OrbPhase2AnimationType.BlackHole:
+                    {
+                        OrbFrame.Y = OrbFrame.Height;
+
+                        OrbFrame.X += OrbFrame.Width;
+                        if (OrbFrame.X > OrbFrame.Width)
+                            OrbFrame.X = 0;
+                    }
+                        break;
+                }
+            }
         }
     }
 }
