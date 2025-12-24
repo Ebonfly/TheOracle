@@ -35,7 +35,7 @@ float4 main(float2 uv : TEXCOORD) : COLOR
     
 	final -= tex2D(tex0, uv.y + float2(uTime*0.02,uv.x*0.3+sin(uTime*0.1+uv.x*3.14)*0.2))*0.25;
 	
-    float4 transition = 1-saturate(tex2D(tex2, uv + float2(uTransitionTime, 0)) * tex2D(tex2, uv + float2(uTransitionTime*0.5, 0))*uTransition);
+    float4 transition = 1-saturate(tex2D(tex2, uv + float2(0, uTransitionTime)) * tex2D(tex2, uv + float2(0, uTransitionTime*0.5))*uTransition);
     
     return saturate(final * lerp(uColor2*1.25, uColor,uv.y)*0.5 * uOpacity) - transition;
 }

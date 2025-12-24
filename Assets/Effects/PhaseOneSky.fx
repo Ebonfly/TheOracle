@@ -22,7 +22,7 @@ float4 main(float2 uv : TEXCOORD) : COLOR
     
     float4 final = pow(c,2.5-c2*3)*2 * uv.y;
     
-    float4 transition = saturate(tex2D(tex2, uv + float2(uTransitionTime, 0)) * tex2D(tex2, uv + float2(uTransitionTime*0.5, 0))*uTransition);
+    float4 transition = saturate(tex2D(tex2, uv + float2(0, uTransitionTime)) * tex2D(tex2, uv + float2(0, uTransitionTime*0.5))*uTransition);
     
     return saturate(final * lerp(uColor2*1.25, uColor,uv.y) * uOpacity) - transition;
 }
