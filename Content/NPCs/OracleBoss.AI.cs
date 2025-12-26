@@ -9,8 +9,6 @@ public partial class OracleBoss : ModNPC
 {
     public override void AI()
     {
-        Phase2 = Main.mouseLeft;
-
         if (Phase2)
             AnyOracleIsPhase2 = true;
 
@@ -28,6 +26,7 @@ public partial class OracleBoss : ModNPC
 
         if (Main.mouseRight)
         {
+            Phase2 = false;
             Substate = 0;
             NPC.velocity = (Main.MouseWorld - NPC.Center) * 0.05f;
             AIState = PhaseTransition;
