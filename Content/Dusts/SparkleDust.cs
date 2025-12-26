@@ -18,8 +18,10 @@ public class SparkleDust : ModDust
         if (dust.alpha < 255)
             dust.alpha += 17;
         dust.position += dust.velocity;
-        dust.velocity *= 0.9f;
-        dust.scale *= 0.98f;
+        dust.velocity *= 0.94f;
+        dust.scale *= 0.96f;
+        if (dust.velocity.Length() < 0.1f)
+            dust.scale *= 0.9f;
         if (dust.scale < 0.1f)
             dust.scale -= 0.01f;
         if (dust.scale <= 0)

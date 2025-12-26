@@ -25,6 +25,7 @@ Projectiles: {
 	OrbitalStrikePortal.DisplayName: Orbital Strike Portal
 	SkipperProjectile.DisplayName: Skipper Projectile
 	CurveClock.DisplayName: Curve Clock
+	VioletExplosion.DisplayName: Violet Explosion
 }
 
 Buffs: {
