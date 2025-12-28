@@ -18,9 +18,10 @@ public partial class OracleBoss : ModNPC
             {
                 if ((int)AITimer == 1)
                 {
+                    SoundEngine.PlaySound(new SoundStyle("TheOracle/Assets/Sounds/electricity"));
                     Main.instance.CameraModifiers.Add(new PunchCameraModifier(NPC.Center, Main.rand.NextVector2Unit(),
                         15, 30, 20));
-                    OracleSky.SkyFlash = 1f;
+                    OracleSky.SkyFlash = .5f;
                 }
 
                 EyeTarget = Vector2.Lerp(EyeTarget, NPC.Center + Main.rand.NextVector2Circular(100, 100), 0.4f);
@@ -38,8 +39,14 @@ public partial class OracleBoss : ModNPC
                 EyeTarget = Vector2.Lerp(EyeTarget, NPC.Center, 0.1f);
                 IdleOrbs(MathHelper.Clamp(AITimer / 70f, 0, 1f));
 
+                if ((int)AITimer == 40)
+                {
+                    SoundEngine.PlaySound(new SoundStyle("TheOracle/Assets/Sounds/OracleBoss/ClockBell"));
+                }
+
                 if ((int)AITimer % 5 == 0 && AITimer >= 40)
                 {
+                    OracleSky.SkyFlash += 0.05f;
                     CrystalOpacity = 0;
                     Projectile.NewProjectile(null, NPC.Center,
                         Vector2.Zero, ModContent.ProjectileType<VioletExplosion>(), 0,
