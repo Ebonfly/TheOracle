@@ -28,6 +28,7 @@ public class OracleSky : CustomSky
     public bool Active;
     public float Intensity;
     public float Transition;
+    public static float SkyFlash, SkyFlashRate = 0.1f;
     public override float GetCloudAlpha() => MathHelper.Lerp(base.GetCloudAlpha(), .05f, Intensity);
 
     public override void Reset()
@@ -35,6 +36,7 @@ public class OracleSky : CustomSky
         Active = false;
         Transition = 0f;
         Intensity = 0f;
+        SkyFlash = 0f;
     }
 
     public override bool IsActive() => Intensity > 0;
@@ -51,6 +53,13 @@ public class OracleSky : CustomSky
 
     public override void Update(GameTime gameTime)
     {
+        SkyFlash = MathHelper.Lerp(SkyFlash, 0, SkyFlashRate);
+        if (SkyFlash < 0.01f)
+        {
+            SkyFlashRate = 0.1f;
+            SkyFlash = 0;
+        }
+
         Intensity = MathHelper.Lerp(Intensity, Active.ToInt(), 0.1f);
         if (Intensity < 0.01f)
             Intensity = 0;
@@ -63,6 +72,7 @@ public class OracleSky : CustomSky
 
     public override void Draw(SpriteBatch spriteBatch, float minDepth, float maxDepth)
     {
+        Rectangle rect = new Rectangle(0, 0, Main.screenWidth, Main.screenHeight);
         if (maxDepth >= 3.40282347E+38f && minDepth < 3.40282347E+38f)
         {
             spriteBatch.End(out var ss);
@@ -72,14 +82,13 @@ public class OracleSky : CustomSky
                 effect = Effects.PhaseTwoSky.Shader
             });
 
-            Effects.PhaseTwoSky.Opacity = Intensity * 1.5f;
+            Effects.PhaseTwoSky.Opacity = Intensity * 1.5f * (SkyFlash + 1);
             Effects.PhaseTwoSky.Time = Time * 0.25f;
             Effects.PhaseTwoSky.TransitionTime = Time;
             Effects.PhaseTwoSky.Transition = Transition * 50;
             Effects.PhaseTwoSky.ApplySky();
             Main.graphics.GraphicsDevice.Textures[1] = Images.Noise.Textures.SmearNoise;
             Main.graphics.GraphicsDevice.Textures[2] = Images.Noise.Textures.SmearNoise;
-            Rectangle rect = new Rectangle(0, 0, Main.screenWidth, Main.screenHeight);
             spriteBatch.Draw(Images.Noise.Textures.SwirlyNoise, rect, Color.White);
 
             spriteBatch.End();
@@ -92,7 +101,7 @@ public class OracleSky : CustomSky
             Main.graphics.GraphicsDevice.Textures[2] = Images.Noise.Textures.SmearNoise;
 
             Effects.PhaseOneSky.Time = Time;
-            Effects.PhaseOneSky.Opacity = Intensity;
+            Effects.PhaseOneSky.Opacity = Intensity * (SkyFlash + 1);
             Effects.PhaseOneSky.TransitionTime = Time;
             Effects.PhaseOneSky.Transition = Transition * 2;
             Effects.PhaseOneSky.ApplySky();
@@ -102,5 +111,7 @@ public class OracleSky : CustomSky
             spriteBatch.End();
             spriteBatch.Begin(ss);
         }
+
+        spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, Color.White with { A = 0 } * SkyFlash);
     }
 }
